@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>REANIMATE PRO</title>
+    <title>PCR EXTRAHOSPITALÀRIA</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body { font-family: -apple-system, system-ui, sans-serif; touch-action: manipulation; -webkit-user-select: none; }
@@ -26,12 +26,16 @@
         <p class="text-2xl font-black uppercase">Revisar Ritme</p>
     </div>
 
-    <header class="bg-white px-5 pt-12 pb-4 border-b flex justify-between items-center shadow-sm">
-        <div class="flex items-center gap-2">
-            <div class="bg-blue-600 p-1.5 rounded-lg text-white font-bold text-lg w-8 text-center">B</div>
-            <h1 class="text-xl font-black text-slate-800 tracking-tight uppercase">REANIMATE</h1>
+    <header class="bg-white px-4 pt-12 pb-4 border-b flex justify-between items-center shadow-sm">
+        <div class="flex items-center gap-2 max-w-[70%]">
+            <div class="bg-blue-600 p-1.5 rounded-lg text-white font-bold text-sm shrink-0">PCR</div>
+            <h1 class="text-base font-black text-slate-800 tracking-tighter uppercase leading-none">
+                Extrahospitalària
+            </h1>
         </div>
-        <button onclick="confirmStop()" class="text-white font-bold text-[10px] bg-red-600 px-4 py-2 rounded-full shadow-sm uppercase">Finalitzar registre</button>
+        <button onclick="confirmStop()" class="text-white font-bold text-[9px] bg-red-600 px-3 py-2 rounded-full shadow-sm uppercase shrink-0">
+            Finalitzar
+        </button>
     </header>
 
     <div id="timer-box" class="bg-white grid grid-cols-3 border-b divide-x">
