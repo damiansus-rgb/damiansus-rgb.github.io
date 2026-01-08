@@ -34,16 +34,16 @@
         <button onclick="confirmStop()" class="text-white font-bold text-[9px] bg-red-600 px-3 py-2 rounded-full shadow-sm uppercase shrink-0">Finalitzar</button>
     </header>
 
-    <div id="timer-box" class="bg-white grid grid-cols-3 border-b divide-x">
-        <div class="p-3 text-center">
+    <div id="timer-box" class="bg-white grid grid-cols-3 border-b divide-x text-center">
+        <div class="p-3">
             <p class="text-[8px] font-bold text-slate-400 uppercase mb-1">Temps Total</p>
             <span id="t-total" class="text-2xl font-mono font-black text-slate-800 tracking-tighter">00:00:00</span>
         </div>
-        <div id="cycle-box" class="p-3 text-center">
+        <div id="cycle-box" class="p-3">
             <p class="text-[8px] font-bold text-slate-400 uppercase mb-1">Revisió en:</p>
             <span id="t-cycle" class="text-2xl font-mono font-black text-blue-600 tracking-tighter">02:00</span>
         </div>
-        <div class="p-3 text-center">
+        <div class="p-3">
             <p class="text-[8px] font-bold text-slate-400 uppercase mb-1">Cicle Actual</p>
             <span id="cycle-count" class="text-2xl font-mono font-black text-slate-800">1</span>
         </div>
@@ -69,20 +69,55 @@
         </div>
     </div>
 
-    <div class="bg-white p-4 grid grid-cols-2 gap-2 pb-10 shadow-2xl">
+    <div class="bg-white p-4 grid grid-cols-2 gap-2 pb-10 shadow-2xl overflow-y-auto max-h-[40vh]">
         <button onclick="toggleModal('ritme-modal')" class="bg-blue-700 text-white p-4 rounded-xl font-bold text-[11px] btn-press uppercase">Ritmes</button>
         <button onclick="logAction('Adrenalina', '1 mg'); updateCount('adr')" class="bg-blue-700 text-white p-4 rounded-xl font-bold text-[11px] btn-press uppercase">Adrenalina</button>
         <button onclick="logAction('Descàrrega', '200J'); updateCount('shock')" class="bg-blue-700 text-white p-4 rounded-xl font-bold text-[11px] btn-press uppercase">Descàrrega</button>
         <button onclick="logAction('Amiodarona', '300 mg'); updateCount('amio')" class="bg-blue-700 text-white p-4 rounded-xl font-bold text-[11px] btn-press uppercase">Amiodarona</button>
-        <button onclick="toggleModal('ht-modal')" class="bg-blue-50 text-blue-700 p-4 rounded-xl font-bold text-[11px] btn-press uppercase border border-blue-100">H/T Causes</button>
-        <button onclick="toggleModal('notes-modal')" class="bg-blue-50 text-blue-700 p-4 rounded-xl font-bold text-[11px] btn-press uppercase border border-blue-100">Notes</button>
+        
+        <button onclick="toggleModal('intubacio-modal')" class="bg-blue-100 text-blue-800 p-4 rounded-xl font-bold text-[11px] btn-press uppercase">Vía Aèria</button>
+        <button onclick="logAction('ECMO', 'Inici')" class="bg-blue-100 text-blue-800 p-4 rounded-xl font-bold text-[11px] btn-press uppercase">ECMO</button>
+        
+        <button onclick="toggleModal('ht-modal')" class="bg-slate-100 text-slate-700 p-4 rounded-xl font-bold text-[11px] btn-press uppercase border border-slate-200">H/T Causes</button>
+        <button onclick="toggleModal('notes-modal')" class="bg-slate-100 text-slate-700 p-4 rounded-xl font-bold text-[11px] btn-press uppercase border border-slate-200">Notes</button>
+        
         <button onclick="toggleModal('history-modal')" class="bg-slate-800 text-white p-4 rounded-xl font-bold text-[11px] btn-press uppercase col-span-2 text-center">Consultar Historial</button>
+    </div>
+
+    <div id="intubacio-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-6 z-[60]">
+        <div class="bg-white rounded-3xl w-full max-w-sm p-6 shadow-2xl">
+            <h2 class="text-xs font-bold text-slate-800 mb-6 text-center uppercase tracking-tight">Dispositiu Vía Aèria</h2>
+            
+            <div class="space-y-4">
+                <div>
+                    <p class="text-[10px] font-bold text-slate-400 uppercase mb-2">TUBO ET (Mida)</p>
+                    <div class="grid grid-cols-4 gap-2">
+                        <button onclick="logIntub('Tubo ET', '5.0')" class="bg-blue-600 text-white py-2 rounded-lg text-[10px] font-bold">5.0</button>
+                        <button onclick="logIntub('Tubo ET', '5.5')" class="bg-blue-600 text-white py-2 rounded-lg text-[10px] font-bold">5.5</button>
+                        <button onclick="logIntub('Tubo ET', '6.0')" class="bg-blue-600 text-white py-2 rounded-lg text-[10px] font-bold">6.0</button>
+                        <button onclick="logIntub('Tubo ET', '6.5')" class="bg-blue-600 text-white py-2 rounded-lg text-[10px] font-bold">6.5</button>
+                        <button onclick="logIntub('Tubo ET', '7.0')" class="bg-blue-600 text-white py-2 rounded-lg text-[10px] font-bold">7.0</button>
+                        <button onclick="logIntub('Tubo ET', '7.5')" class="bg-blue-600 text-white py-2 rounded-lg text-[10px] font-bold">7.5</button>
+                        <button onclick="logIntub('Tubo ET', '8.0')" class="bg-blue-600 text-white py-2 rounded-lg text-[10px] font-bold">8.0</button>
+                        <button onclick="logIntub('Tubo ET', '8.5')" class="bg-blue-600 text-white py-2 rounded-lg text-[10px] font-bold">8.5</button>
+                    </div>
+                </div>
+                <div>
+                    <p class="text-[10px] font-bold text-slate-400 uppercase mb-2">IGEL (Mida)</p>
+                    <div class="grid grid-cols-3 gap-2">
+                        <button onclick="logIntub('IGEL', '3')" class="bg-indigo-600 text-white py-3 rounded-lg text-[11px] font-bold">3</button>
+                        <button onclick="logIntub('IGEL', '4')" class="bg-indigo-600 text-white py-3 rounded-lg text-[11px] font-bold">4</button>
+                        <button onclick="logIntub('IGEL', '5')" class="bg-indigo-600 text-white py-3 rounded-lg text-[11px] font-bold">5</button>
+                    </div>
+                </div>
+            </div>
+            <button onclick="toggleModal('intubacio-modal')" class="w-full mt-6 bg-slate-100 text-slate-500 py-3 rounded-full font-bold text-xs uppercase">Cancel·la</button>
+        </div>
     </div>
 
     <div id="ht-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-6 z-50">
         <div class="bg-white rounded-3xl w-full max-w-sm p-6 shadow-2xl overflow-y-auto max-h-[90vh]">
-            <h2 class="text-xs font-bold text-slate-800 mb-6 text-center uppercase tracking-tight">Descartar causes reversibles</h2>
-            
+            <h2 class="text-xs font-bold text-slate-800 mb-6 text-center uppercase tracking-tight">Causa Reversible</h2>
             <div class="mb-4">
                 <p class="text-center font-bold text-slate-400 text-[10px] mb-2">H</p>
                 <div class="grid grid-cols-2 gap-2">
@@ -92,69 +127,30 @@
                     <button id="btn-Hidroelectròlits" onclick="toggleHT('Hidroelectròlits')" class="bg-blue-900 text-white py-2.5 rounded-full text-[10px] font-bold btn-press">Hidroelectròlits</button>
                 </div>
             </div>
-
             <div class="mb-6">
                 <p class="text-center font-bold text-slate-400 text-[10px] mb-2">T</p>
                 <div class="grid grid-cols-2 gap-2">
-                    <button id="btn-Pneumotòrax" onclick="toggleHT('Pneumotòrax')" class="bg-blue-900 text-white py-2.5 rounded-full text-[10px] font-bold btn-press leading-tight">Pneumotòrax a tensió</button>
+                    <button id="btn-Pneumotòrax" onclick="toggleHT('Pneumotòrax')" class="bg-blue-900 text-white py-2.5 rounded-full text-[10px] font-bold btn-press">Pneumotòrax Tensió</button>
                     <button id="btn-Taponament" onclick="toggleHT('Taponament')" class="bg-blue-900 text-white py-2.5 rounded-full text-[10px] font-bold btn-press">Taponament</button>
                     <button id="btn-Tòxics" onclick="toggleHT('Tòxics')" class="bg-blue-900 text-white py-2.5 rounded-full text-[10px] font-bold btn-press">Tòxics</button>
-                    <button id="btn-Trombosi" onclick="toggleHT('Trombosi')" class="bg-blue-900 text-white py-2.5 rounded-full text-[10px] font-bold btn-press leading-tight">Trombosi (TEP/IAM)</button>
+                    <button id="btn-Trombosi" onclick="toggleHT('Trombosi')" class="bg-blue-900 text-white py-2.5 rounded-full text-[10px] font-bold btn-press">Trombosi (IAM/TEP)</button>
                 </div>
             </div>
-
-            <div class="flex gap-2">
-                <button onclick="toggleModal('ht-modal')" class="flex-1 bg-blue-700 text-white py-3 rounded-full font-bold text-xs uppercase shadow-lg">Acceptar</button>
-                <button onclick="toggleModal('ht-modal')" class="flex-1 bg-slate-100 text-slate-600 py-3 rounded-full font-bold text-xs uppercase">Cancel·la</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="stop-modal" class="hidden fixed inset-0 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-6 z-[110]">
-        <div class="bg-white rounded-3xl w-full max-w-sm p-6 text-center shadow-2xl">
-            <h2 class="text-lg font-black text-slate-800 mb-2 uppercase">Aturar RCP?</h2>
-            <p class="text-slate-500 text-sm mb-6">Vols guardar el registre i començar de nou?</p>
-            <div class="space-y-3">
-                <button onclick="saveAndReset()" class="w-full bg-red-600 text-white py-4 rounded-2xl font-bold uppercase shadow-lg">Guardar i Finalitzar</button>
-                <button onclick="resumeCPR()" class="w-full bg-slate-100 text-slate-600 py-4 rounded-2xl font-bold uppercase tracking-widest">TORNAR</button>
-            </div>
+            <button onclick="toggleModal('ht-modal')" class="w-full bg-blue-700 text-white py-4 rounded-full font-bold text-xs uppercase">Acceptar</button>
         </div>
     </div>
 
     <div id="ritme-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-6 z-50">
         <div class="bg-white rounded-3xl w-full max-w-sm p-6 text-center shadow-2xl">
             <h2 class="text-xs font-bold text-slate-800 mb-6 uppercase">Tipus de Ritme</h2>
-            <p class="text-[9px] font-bold text-slate-400 uppercase mb-2">Ritmes NO Desfibril·lables</p>
             <div class="grid grid-cols-2 gap-2 mb-4">
                 <button onclick="logRitme('AESP')" class="bg-slate-500 text-white py-3 rounded-full text-[11px] font-bold">AESP</button>
                 <button onclick="logRitme('Asistòlia')" class="bg-slate-500 text-white py-3 rounded-full text-[11px] font-bold">Asistòlia</button>
-            </div>
-            <p class="text-[9px] font-bold text-slate-400 uppercase mb-2">Ritmes Desfibril·lables</p>
-            <div class="grid grid-cols-2 gap-2 mb-6">
                 <button onclick="logRitme('FV')" class="bg-blue-600 text-white py-3 rounded-full text-[11px] font-bold">FV</button>
                 <button onclick="logRitme('TVsp')" class="bg-blue-600 text-white py-3 rounded-full text-[11px] font-bold">TVsp</button>
             </div>
-            <button onclick="logRitme('ROSC')" class="w-full bg-slate-400 text-white py-3 rounded-full text-[11px] font-bold mb-4 uppercase">ROSC</button>
+            <button onclick="logRitme('ROSC')" class="w-full bg-green-600 text-white py-3 rounded-full text-[11px] font-bold mb-4 uppercase tracking-widest">ROSC (Recuperació)</button>
             <button onclick="toggleModal('ritme-modal')" class="text-slate-400 font-bold text-xs uppercase">Tancar</button>
-        </div>
-    </div>
-
-    <div id="notes-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-6 z-50">
-        <div class="bg-white rounded-3xl w-full max-w-sm p-6 shadow-2xl">
-            <h2 class="text-xs font-bold text-slate-800 mb-4 uppercase tracking-tighter">Afegir Nota al registre</h2>
-            <textarea id="note-input" rows="4" class="w-full border p-3 rounded-xl mb-4 text-sm" placeholder="Escriu la teva nota aquí..."></textarea>
-            <div class="flex gap-2">
-                <button onclick="saveNote()" class="flex-1 bg-blue-700 text-white py-3 rounded-full font-bold text-xs uppercase">Guardar</button>
-                <button onclick="toggleModal('notes-modal')" class="flex-1 bg-slate-100 text-slate-600 py-3 rounded-full font-bold text-xs uppercase">Tancar</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="history-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-6 z-50">
-        <div class="bg-white rounded-3xl w-full max-w-sm p-6 h-3/4 flex flex-col shadow-2xl">
-            <h2 class="text-xs font-bold text-slate-800 mb-4 uppercase text-center tracking-widest">Historial de Registres</h2>
-            <div id="history-list" class="flex-1 overflow-y-auto space-y-3 mb-4"></div>
-            <button onclick="toggleModal('history-modal')" class="w-full bg-blue-700 text-white py-3 rounded-full font-bold text-xs uppercase">Tancar</button>
         </div>
     </div>
 
@@ -169,6 +165,11 @@
             const time = document.getElementById('t-total').innerText;
             sessionLog.push({ time, action, qty });
             renderLog();
+        }
+
+        function logIntub(device, size) {
+            logAction(device, 'Mida: ' + size);
+            toggleModal('intubacio-modal');
         }
 
         function renderLog() {
@@ -216,6 +217,21 @@
             o.start(); g.gain.exponentialRampToValueAtTime(0.0001, audio.currentTime + 1); o.stop(audio.currentTime + 1);
         }
 
+        function toggleModal(id) {
+            document.getElementById(id).classList.toggle('hidden');
+            if(id === 'history-modal') loadHistory();
+        }
+
+        function logRitme(r) { logAction('Ritme: ' + r); toggleModal('ritme-modal'); }
+        
+        function toggleHT(c) { 
+            const b = document.getElementById('btn-' + c);
+            b.classList.toggle('cause-selected');
+            logAction('Causa: ' + c, b.classList.contains('cause-selected') ? 'SI' : 'NO');
+        }
+
+        function updateCount(k) { counts[k]++; document.getElementById('count-'+k).innerText = counts[k]; }
+
         function confirmStop() {
             if(!active) return;
             clearInterval(timer);
@@ -240,21 +256,17 @@
             history.push(session);
             localStorage.setItem('rcp_history', JSON.stringify(history));
 
-            totalSecs = 0; cycleSecs = 120; cycles = 1; active = false;
-            counts = { shock:0, adr:0, amio:0 };
-            sessionLog = [];
+            // Reset UI
+            location.reload(); 
+        }
 
-            document.getElementById('t-total').innerText = "00:00:00";
-            document.getElementById('t-cycle').innerText = "02:00";
-            document.getElementById('cycle-count').innerText = "1";
-            document.getElementById('count-cicles').innerText = "1";
-            document.getElementById('count-shock').innerText = "0";
-            document.getElementById('count-adr').innerText = "0";
-            document.getElementById('count-amio').innerText = "0";
-            document.getElementById('event-log').innerHTML = '<div id="placeholder" class="text-center py-10 opacity-20 italic text-sm">Inicia l\'acció per començar</div>';
-            
-            document.querySelectorAll('.cause-selected').forEach(btn => btn.classList.remove('cause-selected'));
-            document.getElementById('stop-modal').classList.add('hidden');
+        function saveNote() {
+            const val = document.getElementById('note-input').value;
+            if(val) {
+                logAction("NOTA: " + val);
+                document.getElementById('note-input').value = '';
+                toggleModal('notes-modal');
+            }
         }
 
         function loadHistory() {
@@ -276,28 +288,34 @@
                 </div>
             `).reverse().join('') : "<p class='text-center opacity-40 py-4 text-xs font-bold uppercase'>Sense registres.</p>";
         }
-
-        function saveNote() {
-            const val = document.getElementById('note-input').value;
-            if(val) {
-                logAction("NOTA: " + val);
-                document.getElementById('note-input').value = '';
-                toggleModal('notes-modal');
-            }
-        }
-
-        function toggleModal(id) {
-            document.getElementById(id).classList.toggle('hidden');
-            if(id === 'history-modal') loadHistory();
-        }
-
-        function logRitme(r) { logAction('Ritme: ' + r); toggleModal('ritme-modal'); }
-        function toggleHT(c) { 
-            const b = document.getElementById('btn-' + c);
-            b.classList.toggle('cause-selected');
-            logAction('Causa: ' + c, b.classList.contains('cause-selected') ? 'SI' : 'NO');
-        }
-        function updateCount(k) { counts[k]++; document.getElementById('count-'+k).innerText = counts[k]; }
     </script>
+
+    <div id="stop-modal" class="hidden fixed inset-0 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-6 z-[110]">
+        <div class="bg-white rounded-3xl w-full max-w-sm p-6 text-center">
+            <h2 class="text-lg font-black uppercase mb-4">Finalitzar RCP?</h2>
+            <button onclick="saveAndReset()" class="w-full bg-red-600 text-white py-4 rounded-2xl font-bold uppercase mb-2">Guardar i Sortir</button>
+            <button onclick="resumeCPR()" class="w-full bg-slate-100 py-4 rounded-2xl font-bold uppercase">Tornar</button>
+        </div>
+    </div>
+
+    <div id="notes-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-6 z-50">
+        <div class="bg-white rounded-3xl w-full max-w-sm p-6">
+            <h2 class="text-xs font-bold mb-4 uppercase">Nota de Veu/Text</h2>
+            <textarea id="note-input" rows="4" class="w-full border p-3 rounded-xl mb-4 text-sm" placeholder="Escriu la nota..."></textarea>
+            <div class="flex gap-2">
+                <button onclick="saveNote()" class="flex-1 bg-blue-700 text-white py-3 rounded-full font-bold text-xs uppercase">Guardar</button>
+                <button onclick="toggleModal('notes-modal')" class="flex-1 bg-slate-100 py-3 rounded-full font-bold text-xs uppercase">Tancar</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="history-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-6 z-50">
+        <div class="bg-white rounded-3xl w-full max-w-sm p-6 h-3/4 flex flex-col">
+            <h2 class="text-xs font-bold mb-4 uppercase text-center tracking-widest">Historial</h2>
+            <div id="history-list" class="flex-1 overflow-y-auto mb-4"></div>
+            <button onclick="toggleModal('history-modal')" class="w-full bg-blue-700 text-white py-3 rounded-full font-bold text-xs uppercase">Tancar</button>
+        </div>
+    </div>
+
 </body>
 </html>
