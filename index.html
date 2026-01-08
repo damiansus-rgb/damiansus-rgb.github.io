@@ -29,13 +29,9 @@
     <header class="bg-white px-4 pt-12 pb-4 border-b flex justify-between items-center shadow-sm">
         <div class="flex items-center gap-2 max-w-[70%]">
             <div class="bg-blue-600 p-1.5 rounded-lg text-white font-bold text-sm shrink-0">PCR</div>
-            <h1 class="text-base font-black text-slate-800 tracking-tighter uppercase leading-none">
-                Extrahospitalària
-            </h1>
+            <h1 class="text-base font-black text-slate-800 tracking-tighter uppercase leading-none">Extrahospitalària</h1>
         </div>
-        <button onclick="confirmStop()" class="text-white font-bold text-[9px] bg-red-600 px-3 py-2 rounded-full shadow-sm uppercase shrink-0">
-            Finalitzar
-        </button>
+        <button onclick="confirmStop()" class="text-white font-bold text-[9px] bg-red-600 px-3 py-2 rounded-full shadow-sm uppercase shrink-0">Finalitzar</button>
     </header>
 
     <div id="timer-box" class="bg-white grid grid-cols-3 border-b divide-x">
@@ -83,6 +79,37 @@
         <button onclick="toggleModal('history-modal')" class="bg-slate-800 text-white p-4 rounded-xl font-bold text-[11px] btn-press uppercase col-span-2 text-center">Consultar Historial</button>
     </div>
 
+    <div id="ht-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-6 z-50">
+        <div class="bg-white rounded-3xl w-full max-w-sm p-6 shadow-2xl overflow-y-auto max-h-[90vh]">
+            <h2 class="text-xs font-bold text-slate-800 mb-6 text-center uppercase tracking-tight">Descartar causes reversibles</h2>
+            
+            <div class="mb-4">
+                <p class="text-center font-bold text-slate-400 text-[10px] mb-2">H</p>
+                <div class="grid grid-cols-2 gap-2">
+                    <button id="btn-Hipovolèmia" onclick="toggleHT('Hipovolèmia')" class="bg-blue-900 text-white py-2.5 rounded-full text-[10px] font-bold btn-press">Hipovolèmia</button>
+                    <button id="btn-Hipotèrmia" onclick="toggleHT('Hipotèrmia')" class="bg-blue-900 text-white py-2.5 rounded-full text-[10px] font-bold btn-press">Hipotèrmia</button>
+                    <button id="btn-Hipòxia" onclick="toggleHT('Hipòxia')" class="bg-blue-900 text-white py-2.5 rounded-full text-[10px] font-bold btn-press">Hipòxia</button>
+                    <button id="btn-Hidroelectròlits" onclick="toggleHT('Hidroelectròlits')" class="bg-blue-900 text-white py-2.5 rounded-full text-[10px] font-bold btn-press">Hidroelectròlits</button>
+                </div>
+            </div>
+
+            <div class="mb-6">
+                <p class="text-center font-bold text-slate-400 text-[10px] mb-2">T</p>
+                <div class="grid grid-cols-2 gap-2">
+                    <button id="btn-Pneumotòrax" onclick="toggleHT('Pneumotòrax')" class="bg-blue-900 text-white py-2.5 rounded-full text-[10px] font-bold btn-press leading-tight">Pneumotòrax a tensió</button>
+                    <button id="btn-Taponament" onclick="toggleHT('Taponament')" class="bg-blue-900 text-white py-2.5 rounded-full text-[10px] font-bold btn-press">Taponament</button>
+                    <button id="btn-Tòxics" onclick="toggleHT('Tòxics')" class="bg-blue-900 text-white py-2.5 rounded-full text-[10px] font-bold btn-press">Tòxics</button>
+                    <button id="btn-Trombosi" onclick="toggleHT('Trombosi')" class="bg-blue-900 text-white py-2.5 rounded-full text-[10px] font-bold btn-press leading-tight">Trombosi (TEP/IAM)</button>
+                </div>
+            </div>
+
+            <div class="flex gap-2">
+                <button onclick="toggleModal('ht-modal')" class="flex-1 bg-blue-700 text-white py-3 rounded-full font-bold text-xs uppercase shadow-lg">Acceptar</button>
+                <button onclick="toggleModal('ht-modal')" class="flex-1 bg-slate-100 text-slate-600 py-3 rounded-full font-bold text-xs uppercase">Cancel·la</button>
+            </div>
+        </div>
+    </div>
+
     <div id="stop-modal" class="hidden fixed inset-0 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-6 z-[110]">
         <div class="bg-white rounded-3xl w-full max-w-sm p-6 text-center shadow-2xl">
             <h2 class="text-lg font-black text-slate-800 mb-2 uppercase">Aturar RCP?</h2>
@@ -94,11 +121,21 @@
         </div>
     </div>
 
-    <div id="history-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-6 z-50">
-        <div class="bg-white rounded-3xl w-full max-w-sm p-6 h-3/4 flex flex-col shadow-2xl">
-            <h2 class="text-xs font-bold text-slate-800 mb-4 uppercase text-center tracking-widest">Historial de Registres</h2>
-            <div id="history-list" class="flex-1 overflow-y-auto space-y-3 mb-4"></div>
-            <button onclick="toggleModal('history-modal')" class="w-full bg-blue-700 text-white py-3 rounded-full font-bold text-xs uppercase">Tancar</button>
+    <div id="ritme-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-6 z-50">
+        <div class="bg-white rounded-3xl w-full max-w-sm p-6 text-center shadow-2xl">
+            <h2 class="text-xs font-bold text-slate-800 mb-6 uppercase">Tipus de Ritme</h2>
+            <p class="text-[9px] font-bold text-slate-400 uppercase mb-2">Ritmes NO Desfibril·lables</p>
+            <div class="grid grid-cols-2 gap-2 mb-4">
+                <button onclick="logRitme('AESP')" class="bg-slate-500 text-white py-3 rounded-full text-[11px] font-bold">AESP</button>
+                <button onclick="logRitme('Asistòlia')" class="bg-slate-500 text-white py-3 rounded-full text-[11px] font-bold">Asistòlia</button>
+            </div>
+            <p class="text-[9px] font-bold text-slate-400 uppercase mb-2">Ritmes Desfibril·lables</p>
+            <div class="grid grid-cols-2 gap-2 mb-6">
+                <button onclick="logRitme('FV')" class="bg-blue-600 text-white py-3 rounded-full text-[11px] font-bold">FV</button>
+                <button onclick="logRitme('TVsp')" class="bg-blue-600 text-white py-3 rounded-full text-[11px] font-bold">TVsp</button>
+            </div>
+            <button onclick="logRitme('ROSC')" class="w-full bg-slate-400 text-white py-3 rounded-full text-[11px] font-bold mb-4 uppercase">ROSC</button>
+            <button onclick="toggleModal('ritme-modal')" class="text-slate-400 font-bold text-xs uppercase">Tancar</button>
         </div>
     </div>
 
@@ -110,6 +147,14 @@
                 <button onclick="saveNote()" class="flex-1 bg-blue-700 text-white py-3 rounded-full font-bold text-xs uppercase">Guardar</button>
                 <button onclick="toggleModal('notes-modal')" class="flex-1 bg-slate-100 text-slate-600 py-3 rounded-full font-bold text-xs uppercase">Tancar</button>
             </div>
+        </div>
+    </div>
+
+    <div id="history-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-6 z-50">
+        <div class="bg-white rounded-3xl w-full max-w-sm p-6 h-3/4 flex flex-col shadow-2xl">
+            <h2 class="text-xs font-bold text-slate-800 mb-4 uppercase text-center tracking-widest">Historial de Registres</h2>
+            <div id="history-list" class="flex-1 overflow-y-auto space-y-3 mb-4"></div>
+            <button onclick="toggleModal('history-modal')" class="w-full bg-blue-700 text-white py-3 rounded-full font-bold text-xs uppercase">Tancar</button>
         </div>
     </div>
 
@@ -208,6 +253,7 @@
             document.getElementById('count-amio').innerText = "0";
             document.getElementById('event-log').innerHTML = '<div id="placeholder" class="text-center py-10 opacity-20 italic text-sm">Inicia l\'acció per començar</div>';
             
+            document.querySelectorAll('.cause-selected').forEach(btn => btn.classList.remove('cause-selected'));
             document.getElementById('stop-modal').classList.add('hidden');
         }
 
@@ -253,31 +299,5 @@
         }
         function updateCount(k) { counts[k]++; document.getElementById('count-'+k).innerText = counts[k]; }
     </script>
-
-    <div id="ritme-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-6 z-50">
-        <div class="bg-white rounded-3xl w-full max-w-sm p-6 text-center shadow-2xl">
-            <h2 class="text-xs font-bold text-slate-800 mb-6 uppercase">Tipus de Ritme</h2>
-            <div class="grid grid-cols-2 gap-3 mb-6">
-                <button onclick="logRitme('AESP')" class="bg-slate-500 text-white py-3 rounded-full text-[11px] font-bold btn-press">AESP</button>
-                <button onclick="logRitme('Asistòlia')" class="bg-slate-500 text-white py-3 rounded-full text-[11px] font-bold btn-press">Asistòlia</button>
-                <button onclick="logRitme('FV')" class="bg-blue-600 text-white py-3 rounded-full text-[11px] font-bold btn-press">FV</button>
-                <button onclick="logRitme('TVsp')" class="bg-blue-600 text-white py-3 rounded-full text-[11px] font-bold btn-press">TVsp</button>
-            </div>
-            <button onclick="toggleModal('ritme-modal')" class="text-slate-400 font-bold text-xs uppercase">Tancar</button>
-        </div>
-    </div>
-
-    <div id="ht-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-6 z-50">
-        <div class="bg-white rounded-3xl w-full max-w-sm p-6 shadow-2xl">
-            <h2 class="text-xs font-bold text-slate-800 mb-6 text-center uppercase">Causes Reversibles</h2>
-            <div class="grid grid-cols-2 gap-2">
-                <button id="btn-Hipovolèmia" onclick="toggleHT('Hipovolèmia')" class="bg-blue-900 text-white py-2 rounded-full text-[10px] font-bold btn-press shadow-md">Hipovolèmia</button>
-                <button id="btn-Hipòxia" onclick="toggleHT('Hipòxia')" class="bg-blue-900 text-white py-2 rounded-full text-[10px] font-bold btn-press shadow-md">Hipòxia</button>
-                <button id="btn-Tòxics" onclick="toggleHT('Tòxics')" class="bg-blue-900 text-white py-2 rounded-full text-[10px] font-bold btn-press shadow-md">Tòxics</button>
-                <button id="btn-Trombosi" onclick="toggleHT('Trombosi')" class="bg-blue-900 text-white py-2 rounded-full text-[10px] font-bold btn-press shadow-md">Trombosi</button>
-            </div>
-            <button onclick="toggleModal('ht-modal')" class="w-full mt-4 bg-blue-700 text-white py-3 rounded-full font-bold text-xs uppercase shadow-lg">Acceptar</button>
-        </div>
-    </div>
 </body>
 </html>
