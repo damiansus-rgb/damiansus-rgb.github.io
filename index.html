@@ -13,10 +13,9 @@
         .log-entry { animation: slideIn 0.3s ease-out; position: relative; overflow: hidden; }
         @keyframes slideIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
         
-        /* Estils per al Swipe */
         .swipe-container { display: flex; transition: transform 0.3s ease; width: calc(100% + 80px); }
         .swipe-content { width: calc(100% - 80px); display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 1.25rem; background: white; border-bottom: 1px solid #f1f5f9; }
-        .delete-btn { width: 80px; background: #ef4444; color: white; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; text-transform: uppercase; }
+        .delete-btn { width: 80px; background: #ef4444; color: white; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; text-transform: uppercase; cursor: pointer; }
         .swiped { transform: translateX(-80px); }
 
         .alert-flash { animation: flash 1s infinite; }
@@ -183,21 +182,19 @@
         let adrActive = false;
         let adrLimitSecs = 180, adrTimeLeft = 180;
 
-        // Gestió del Swipe
+        // Swipe logic
         let startX = 0;
-        let currentSwipeId = null;
 
-        function handleTouchStart(e, id) {
+        function handleTouchStart(e) {
             startX = e.touches[0].clientX;
-            currentSwipeId = id;
         }
 
         function handleTouchMove(e, id) {
             let moveX = e.touches[0].clientX;
             let diff = startX - moveX;
             let container = document.getElementById('swipe-' + id);
-            if (diff > 30) container.classList.add('swiped');
-            if (diff < -30) container.classList.remove('swiped');
+            if (diff > 40) container.classList.add('swiped');
+            if (diff < -40) container.classList.remove('swiped');
         }
 
         function deleteEntry(id) {
@@ -205,7 +202,7 @@
             if (index !== -1) {
                 const entry = sessionLog[index];
                 if (entry.countType) {
-                    counts[entry.countType]--;
+                    counts[entry.countType] = Math.max(0, counts[entry.countType] - 1);
                     document.getElementById('count-' + entry.countType).innerText = counts[entry.countType];
                 }
                 sessionLog.splice(index, 1);
@@ -213,17 +210,28 @@
             }
         }
 
+        function updateCount(k) { 
+            counts[k]++; 
+            document.getElementById('count-'+k).innerText = counts[k]; 
+        }
+
         function logAction(action, qty = '-', countType = null) {
             if(!active) startCPR();
             const id = Date.now();
             const time = document.getElementById('t-total').innerText;
+            
+            // Si el registro tiene un tipo de contador (amio o shock), lo incrementamos
+            if (countType) {
+                updateCount(countType);
+            }
+
             sessionLog.push({ id, time, action, qty, countType });
             renderLog();
         }
 
         function logAdrenalina() {
+            // Llama a logAction pero con el flag de adrenalina
             logAction('Adrenalina', '1 mg', 'adr');
-            updateCount('adr');
             if (!adrActive) {
                 adrActive = true;
                 document.getElementById('adr-container').classList.remove('hidden');
@@ -237,19 +245,18 @@
             if(sessionLog.length > 0 && document.getElementById('placeholder')) document.getElementById('placeholder').remove();
             
             logDiv.innerHTML = sessionLog.map(e => `
-                <div class="log-entry" ontouchstart="handleTouchStart(event, ${e.id})" ontouchmove="handleTouchMove(event, ${e.id})">
+                <div class="log-entry" ontouchstart="handleTouchStart(event)" ontouchmove="handleTouchMove(event, ${e.id})">
                     <div class="swipe-container" id="swipe-${e.id}">
                         <div class="swipe-content">
                             <span class="w-20 text-slate-400 font-mono text-[10px]">${e.time}</span>
                             <span class="flex-1 px-2 uppercase text-center tracking-tight font-bold text-[11px]">${e.action}</span>
                             <span class="w-16 text-right font-bold text-[11px]">${e.qty}</span>
                         </div>
-                        <div class="delete-btn" onclick="deleteEntry(${e.id})">Esborrar</div>
+                        <div class="delete-btn" onclick="deleteEntry(${e.id})">Borrar</div>
                     </div>
                 </div>`).reverse().join('');
         }
 
-        // Resta de funcions originals sense modificacions
         function toggleAdrLimit() {
             adrLimitSecs = (adrLimitSecs === 180) ? 120 : 180;
             document.getElementById('adr-limit-val').innerText = adrLimitSecs / 60;
@@ -337,7 +344,6 @@
             b.classList.toggle('cause-selected');
             logAction('Causa: ' + c, b.classList.contains('cause-selected') ? 'SI' : 'NO');
         }
-        function updateCount(k) { counts[k]++; document.getElementById('count-'+k).innerText = counts[k]; }
         function confirmStop() { if(!active) return; clearInterval(timer); document.getElementById('stop-modal').classList.remove('hidden'); }
         function resumeCPR() { document.getElementById('stop-modal').classList.add('hidden'); active = false; startCPR(); }
 
@@ -368,10 +374,6 @@
                 <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200 text-[10px] shadow-sm mb-3">
                     <div class="flex justify-between items-start mb-2 uppercase">
                         <span class="font-black text-blue-700 leading-tight pr-4">${s.date}</span>
-                        <div class="flex gap-3 shrink-0">
-                            <button onclick="editEntry(${s.id})" class="text-[14px] opacity-70">✏️</button>
-                            <button onclick="deleteEntry(${s.id})" class="text-[14px] opacity-70">🗑️</button>
-                        </div>
                     </div>
                     <div class="grid grid-cols-2 gap-1 font-bold text-slate-600 mb-2 border-t pt-2 border-slate-200/50">
                         <span>⏱️ Cicles: ${s.cycles}</span>
@@ -379,12 +381,6 @@
                         <span>⚡ Shock: ${s.stats.shock}</span>
                         <span>💉 Adren: ${s.stats.adr}</span>
                     </div>
-                    <details class="mt-2 text-slate-500 bg-white p-2 rounded-lg border">
-                        <summary class="font-bold cursor-pointer uppercase text-[9px] text-blue-600">Detalls</summary>
-                        <div class="mt-2 space-y-1 max-h-40 overflow-y-auto font-mono">
-                            ${s.log.map(l => `<p class="border-b pb-1"><strong>${l.time}</strong> - ${l.action} ${l.qty !== '-' ? '('+l.qty+')' : ''}</p>`).join('')}
-                        </div>
-                    </details>
                 </div>`).reverse().join('') : "<p class='text-center opacity-40 py-8 text-xs font-bold uppercase'>Sense registres.</p>";
         }
     </script>
