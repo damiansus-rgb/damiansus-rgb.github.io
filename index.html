@@ -10,27 +10,23 @@
     <style>
         body { font-family: -apple-system, system-ui, sans-serif; touch-action: manipulation; -webkit-user-select: none; }
         .btn-press:active { transform: scale(0.95); filter: brightness(0.9); }
-        .log-entry { animation: slideIn 0.3s ease-out; position: relative; overflow: hidden; background: white; }
+        .log-entry { animation: slideIn 0.3s ease-out; border-bottom: 1px solid #f1f5f9; padding: 0.75rem 1rem; background: white; display: flex; justify-content: space-between; align-items: center; }
         @keyframes slideIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
         
-        /* Swipe logic */
-        .swipe-container { display: flex; transition: transform 0.3s ease; width: calc(100% + 80px); }
-        .swipe-content { width: calc(100% - 80px); display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 1rem; border-bottom: 1px solid #f1f5f9; }
-        .delete-btn { width: 80px; background: #ef4444; color: white; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; text-transform: uppercase; cursor: pointer; }
-        .swiped { transform: translateX(-80px); }
-
         .alert-flash { animation: flash 1s infinite; }
         @keyframes flash { 0%, 100% { background-color: #fee2e2; } 50% { background-color: #ef4444; color: white; } }
         .adr-flash { animation: flash-orange 1s infinite; }
         @keyframes flash-orange { 0%, 100% { background-color: #ffedd5; } 50% { background-color: #f97316; color: white; } }
-        .cause-selected { background-color: #64748b !important; color: white !important; }
-        #toast { transition: opacity 0.5s ease; pointer-events: none; }
+        
+        .selected-item { background-color: #64748b !important; color: white !important; border-color: #475569 !important; }
+        
+        #toast { transition: opacity 0.5s ease; pointer-events: none; z-index: 200; }
         ::-webkit-scrollbar { display: none; }
     </style>
 </head>
 <body class="bg-slate-100 h-screen flex flex-col overflow-hidden relative text-slate-800">
 
-    <div id="toast" class="opacity-0 fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[100] bg-red-600 text-white px-8 py-4 rounded-3xl shadow-2xl text-center">
+    <div id="toast" class="opacity-0 fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-red-600 text-white px-8 py-4 rounded-3xl shadow-2xl text-center">
         <p id="toast-title" class="text-xs font-bold uppercase mb-1">Atenció</p>
         <p id="toast-msg" class="text-2xl font-black uppercase">Revisar Ritme</p>
     </div>
@@ -44,12 +40,12 @@
     </header>
 
     <div id="timer-box" class="bg-white grid grid-cols-3 border-b divide-x text-center shrink-0">
-        <div class="p-3">
-            <p class="text-[8px] font-bold text-slate-400 uppercase mb-1">Temps Total</p>
+        <div class="p-3 text-center">
+            <p class="text-[8px] font-bold text-slate-400 uppercase mb-1">Total</p>
             <span id="t-total" class="text-2xl font-mono font-black tracking-tighter">00:00:00</span>
         </div>
-        <div id="cycle-box" class="p-3">
-            <p class="text-[8px] font-bold text-slate-400 uppercase mb-1">Revisió en:</p>
+        <div id="cycle-box" class="p-3 text-center">
+            <p class="text-[8px] font-bold text-slate-400 uppercase mb-1">Ritme en</p>
             <span id="t-cycle" class="text-2xl font-mono font-black text-blue-600 tracking-tighter">02:00</span>
         </div>
         <div class="p-3 flex flex-col justify-center items-center">
@@ -58,7 +54,7 @@
                 <span id="t-adr" class="text-lg font-mono font-black text-orange-600">03:00</span>
             </div>
             <div id="cycle-count-container">
-                <p class="text-[8px] font-bold text-slate-400 uppercase mb-1">Cicle Actual</p>
+                <p class="text-[8px] font-bold text-slate-400 uppercase mb-1">Cicles</p>
                 <span id="cycle-count" class="text-2xl font-mono font-black">1</span>
             </div>
         </div>
@@ -66,7 +62,7 @@
 
     <div class="bg-slate-50 px-5 py-2 border-b flex justify-between text-[9px] font-bold text-slate-400 uppercase tracking-widest shrink-0">
         <span class="w-20">Temps</span>
-        <span class="flex-1 px-2 text-center">Valoració / Acció</span>
+        <span class="flex-1 px-2 text-center">Acció</span>
         <span class="w-16 text-right">Quant.</span>
     </div>
 
@@ -90,70 +86,88 @@
         <button onclick="logAction('Descàrrega', '200J', 'shock')" class="bg-blue-700 text-white p-4 rounded-xl font-bold text-[11px] btn-press uppercase shadow-md">Descàrrega</button>
         <button onclick="logAction('Amiodarona', '300 mg', 'amio')" class="bg-blue-700 text-white p-4 rounded-xl font-bold text-[11px] btn-press uppercase shadow-md">Amiodarona</button>
         <button onclick="toggleModal('intubacio-modal')" class="bg-blue-100 text-blue-800 p-4 rounded-xl font-bold text-[11px] btn-press uppercase">Vía Aèria</button>
-        <button onclick="toggleModal('sri-modal')" class="bg-blue-100 text-blue-800 p-4 rounded-xl font-bold text-[11px] btn-press uppercase">SRI</button>
-        <button onclick="toggleModal('ht-modal')" class="bg-slate-100 text-slate-700 p-4 rounded-xl font-bold text-[11px] btn-press uppercase border border-slate-200">H/T Causes</button>
-        <button onclick="toggleModal('notes-modal')" class="bg-slate-100 text-slate-700 p-4 rounded-xl font-bold text-[11px] btn-press uppercase border border-slate-200">Notes</button>
+        <button onclick="toggleModal('sri-modal')" class="bg-blue-100 text-blue-800 p-4 rounded-xl font-bold text-[11px] btn-press uppercase">SRI (Fàrmacs)</button>
+        <button onclick="toggleModal('ht-modal')" class="bg-slate-100 text-slate-700 p-4 rounded-xl font-bold text-[11px] btn-press uppercase border">H/T Causes</button>
+        <button onclick="toggleModal('notes-modal')" class="bg-slate-100 text-slate-700 p-4 rounded-xl font-bold text-[11px] btn-press uppercase border">Notes</button>
         <button onclick="toggleModal('history-modal')" class="bg-slate-800 text-white p-4 rounded-xl font-bold text-[11px] btn-press uppercase col-span-2 text-center shadow-lg">Consultar Historial</button>
     </div>
 
-    <div id="sri-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-6 z-[115]">
+    <div id="sri-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-6 z-[150]">
         <div class="bg-white rounded-3xl w-full max-w-sm p-6 shadow-2xl">
-            <h2 class="text-xs font-bold text-slate-800 mb-4 text-center uppercase tracking-widest">Fàrmacs SRI (Dosi Adult)</h2>
-            <div class="grid grid-cols-1 gap-2">
-                <button onclick="logSRI('Rocuroni', '1.2 mg/kg')" class="bg-slate-800 text-white py-3 rounded-xl text-[11px] font-bold flex justify-between px-4"><span>Rocuroni</span><span>1.2 mg/kg</span></button>
-                <button onclick="logSRI('Propofol', '1.5-2.5 mg/kg')" class="bg-slate-800 text-white py-3 rounded-xl text-[11px] font-bold flex justify-between px-4"><span>Propofol</span><span>2 mg/kg</span></button>
-                <button onclick="logSRI('Ketamina', '1-2 mg/kg')" class="bg-slate-800 text-white py-3 rounded-xl text-[11px] font-bold flex justify-between px-4"><span>Ketamina</span><span>2 mg/kg</span></button>
-                <button onclick="logSRI('Midazolam', '0.2-0.3 mg/kg')" class="bg-slate-800 text-white py-3 rounded-xl text-[11px] font-bold flex justify-between px-4"><span>Midazolam</span><span>0.3 mg/kg</span></button>
-                <button onclick="logSRI('Etomidat', '0.3 mg/kg')" class="bg-slate-800 text-white py-3 rounded-xl text-[11px] font-bold flex justify-between px-4"><span>Etomidat</span><span>0.3 mg/kg</span></button>
-                <button onclick="logSRI('Fentanil', '1-3 mcg/kg')" class="bg-slate-800 text-white py-3 rounded-xl text-[11px] font-bold flex justify-between px-4"><span>Fentanil</span><span>2 mcg/kg</span></button>
+            <h2 class="text-xs font-bold text-slate-800 mb-6 text-center uppercase">Fàrmacs SRI (Adult)</h2>
+            <div class="grid grid-cols-1 gap-2 mb-6" id="sri-options">
+                <button onclick="toggleSelect(this, 'Rocuroni', '1.2 mg/kg')" class="bg-slate-50 py-3 rounded-xl text-[11px] font-bold flex justify-between px-4 border border-transparent"><span>Rocuroni</span> <span>1.2 mg/kg</span></button>
+                <button onclick="toggleSelect(this, 'Propofol', '2 mg/kg')" class="bg-slate-50 py-3 rounded-xl text-[11px] font-bold flex justify-between px-4 border border-transparent"><span>Propofol</span> <span>2 mg/kg</span></button>
+                <button onclick="toggleSelect(this, 'Ketamina', '2 mg/kg')" class="bg-slate-50 py-3 rounded-xl text-[11px] font-bold flex justify-between px-4 border border-transparent"><span>Ketamina</span> <span>2 mg/kg</span></button>
+                <button onclick="toggleSelect(this, 'Midazolam', '0.3 mg/kg')" class="bg-slate-50 py-3 rounded-xl text-[11px] font-bold flex justify-between px-4 border border-transparent"><span>Midazolam</span> <span>0.3 mg/kg</span></button>
+                <button onclick="toggleSelect(this, 'Etomidat', '0.3 mg/kg')" class="bg-slate-50 py-3 rounded-xl text-[11px] font-bold flex justify-between px-4 border border-transparent"><span>Etomidat</span> <span>0.3 mg/kg</span></button>
             </div>
-            <button onclick="toggleModal('sri-modal')" class="w-full mt-4 bg-slate-100 py-3 rounded-full font-bold text-xs uppercase text-slate-500">Tancar</button>
+            <button onclick="confirmMultiple('sri-modal', 'sri-options')" class="w-full bg-blue-700 text-white py-4 rounded-full font-bold text-xs uppercase shadow-lg mb-2">Acceptar SRI</button>
+            <button onclick="closeAndClear('sri-modal', 'sri-options')" class="w-full bg-slate-100 py-3 rounded-full font-bold text-xs uppercase text-slate-500">Tancar</button>
+        </div>
+    </div>
+
+    <div id="intubacio-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-6 z-[150]">
+        <div class="bg-white rounded-3xl w-full max-w-sm p-6 shadow-2xl">
+            <h2 class="text-xs font-bold text-slate-800 mb-6 text-center uppercase">Vía Aèria</h2>
+            <div id="airway-options">
+                <p class="text-[10px] font-bold text-slate-400 uppercase mb-2 text-center">TUBO ET</p>
+                <div class="grid grid-cols-4 gap-2 mb-4" id="tube-btns"></div>
+                <p class="text-[10px] font-bold text-slate-400 uppercase mb-2 text-center">IGEL</p>
+                <div class="grid grid-cols-3 gap-2 mb-6">
+                    <button onclick="toggleSelect(this, 'IGEL', '3')" class="bg-slate-50 py-3 rounded-lg text-[11px] font-bold">3</button>
+                    <button onclick="toggleSelect(this, 'IGEL', '4')" class="bg-slate-50 py-3 rounded-lg text-[11px] font-bold">4</button>
+                    <button onclick="toggleSelect(this, 'IGEL', '5')" class="bg-slate-50 py-3 rounded-lg text-[11px] font-bold">5</button>
+                </div>
+            </div>
+            <button onclick="confirmMultiple('intubacio-modal', 'airway-options')" class="w-full bg-blue-700 text-white py-4 rounded-full font-bold text-xs uppercase shadow-lg mb-2">Acceptar</button>
+            <button onclick="closeAndClear('intubacio-modal', 'airway-options')" class="w-full bg-slate-100 py-3 rounded-full font-bold text-xs uppercase text-slate-500">Tancar</button>
+        </div>
+    </div>
+
+    <div id="ritme-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-6 z-[150]">
+        <div class="bg-white rounded-3xl w-full max-w-sm p-6 text-center shadow-2xl">
+            <h2 class="text-xs font-bold mb-6 uppercase">Tipus de Ritme</h2>
+            <div class="grid grid-cols-2 gap-2 mb-6">
+                <button onclick="logRitme('AESP')" class="bg-slate-500 text-white py-3 rounded-xl font-bold text-[11px]">AESP</button>
+                <button onclick="logRitme('Asistòlia')" class="bg-slate-500 text-white py-3 rounded-xl font-bold text-[11px]">Asistòlia</button>
+                <button onclick="logRitme('FV')" class="bg-blue-600 text-white py-3 rounded-xl font-bold text-[11px]">FV</button>
+                <button onclick="logRitme('TVsp')" class="bg-blue-600 text-white py-3 rounded-xl font-bold text-[11px]">TVsp</button>
+            </div>
+            <button onclick="logRitme('ROSC')" class="w-full bg-green-600 text-white py-3 rounded-xl font-bold text-[11px] mb-4 uppercase">ROSC (Recuperació)</button>
+            <button onclick="toggleModal('ritme-modal')" class="text-slate-400 font-bold text-xs uppercase">Tancar</button>
         </div>
     </div>
 
     <script>
         let totalSecs = 0, cycleSecs = 120, cycles = 1, timer, active = false;
+        let adrSecs = 180, adrLimitSecs = 180, adrActive = false;
         let counts = { shock:0, adr:0, amio:0 };
         let sessionLog = [];
         let audioCtx = null;
-        let adrActive = false;
-        let adrLimitSecs = 180, adrTimeLeft = 180;
-        let startX = 0;
-
-        function handleTouchStart(e) { startX = e.touches[0].clientX; }
-        function handleTouchMove(e, id) {
-            let diff = startX - e.touches[0].clientX;
-            let container = document.getElementById('swipe-' + id);
-            if (diff > 40) container.classList.add('swiped');
-            if (diff < -40) container.classList.remove('swiped');
-        }
-
-        function deleteEntry(id) {
-            const index = sessionLog.findIndex(e => e.id === id);
-            if (index !== -1) {
-                const entry = sessionLog[index];
-                if (entry.countType) {
-                    counts[entry.countType] = Math.max(0, counts[entry.countType] - 1);
-                    document.getElementById('count-' + entry.countType).innerText = counts[entry.countType];
-                }
-                sessionLog.splice(index, 1);
-                renderLog();
-            }
-        }
+        let selectedBuffer = [];
 
         function logAction(action, qty = '-', countType = null) {
             if(!active) startCPR();
-            const id = Date.now();
             const time = document.getElementById('t-total').innerText;
             if (countType && countType !== 'adr') {
                 counts[countType]++;
                 document.getElementById('count-'+countType).innerText = counts[countType];
             }
-            sessionLog.push({ id, time, action, qty, countType });
+            sessionLog.push({ time, action, qty });
             renderLog();
         }
 
-        function logSRI(med, dose) { logAction(med, dose); toggleModal('sri-modal'); }
+        function renderLog() {
+            const logDiv = document.getElementById('event-log');
+            if(document.getElementById('placeholder')) document.getElementById('placeholder').remove();
+            logDiv.innerHTML = sessionLog.map(e => `
+                <div class="log-entry">
+                    <span class="w-20 text-slate-400 font-mono text-[10px]">${e.time}</span>
+                    <span class="flex-1 px-2 uppercase text-center font-bold text-[11px] tracking-tight">${e.action}</span>
+                    <span class="w-16 text-right font-bold text-[11px]">${e.qty}</span>
+                </div>`).reverse().join('');
+        }
 
         function logAdrenalina() {
             logAction('Adrenalina', '1 mg', 'adr');
@@ -164,43 +178,17 @@
                 document.getElementById('adr-container').classList.remove('hidden');
                 document.getElementById('cycle-count-container').classList.add('hidden');
             }
-            adrTimeLeft = adrLimitSecs;
-        }
-
-        function renderLog() {
-            const logDiv = document.getElementById('event-log');
-            if(sessionLog.length > 0 && document.getElementById('placeholder')) document.getElementById('placeholder').remove();
-            logDiv.innerHTML = sessionLog.map(e => `
-                <div class="log-entry" ontouchstart="handleTouchStart(event)" ontouchmove="handleTouchMove(event, ${e.id})">
-                    <div class="swipe-container" id="swipe-${e.id}">
-                        <div class="swipe-content">
-                            <span class="w-20 text-slate-400 font-mono text-[10px]">${e.time}</span>
-                            <span class="flex-1 px-2 uppercase text-center tracking-tight font-bold text-[11px]">${e.action}</span>
-                            <span class="w-16 text-right font-bold text-[11px]">${e.qty}</span>
-                        </div>
-                        <div class="delete-btn" onclick="deleteEntry(${e.id})">Esborrar</div>
-                    </div>
-                </div>`).reverse().join('');
+            adrSecs = adrLimitSecs;
         }
 
         function startCPR() {
-            if(active) return;
-            active = true;
+            if(active) return; active = true;
             if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
             timer = setInterval(() => {
                 totalSecs++; cycleSecs--;
-                if(adrActive) adrTimeLeft--;
-                if(cycleSecs <= 0) {
-                    showToast("REVISAR RITME", "red");
-                    cycleSecs = 120; cycles++;
-                    document.getElementById('cycle-count').innerText = cycles;
-                    document.getElementById('count-cicles').innerText = cycles;
-                    logAction(`CICLE ${cycles} INICIAT`, '-');
-                }
-                if(adrActive && adrTimeLeft <= 0) {
-                    showToast("ADRENALINA", "orange");
-                    adrTimeLeft = adrLimitSecs;
-                }
+                if(adrActive) adrSecs--;
+                if(cycleSecs <= 0) { showToast("REVISAR RITME", "red"); cycleSecs = 120; cycles++; document.getElementById('cycle-count').innerText = cycles; document.getElementById('count-cicles').innerText = cycles; logAction(`CICLE ${cycles} INICIAT`); }
+                if(adrActive && adrSecs <= 0) { showToast("ADRENALINA", "orange"); adrSecs = adrLimitSecs; }
                 updateUI();
             }, 1000);
         }
@@ -209,57 +197,62 @@
             const pad = (n) => n.toString().padStart(2,'0');
             document.getElementById('t-total').innerText = `${pad(Math.floor(totalSecs/3600))}:${pad(Math.floor((totalSecs%3600)/60))}:${pad(totalSecs%60)}`;
             document.getElementById('t-cycle').innerText = `${pad(Math.floor(cycleSecs/60))}:${pad(cycleSecs%60)}`;
-            if(adrActive) {
-                document.getElementById('t-adr').innerText = `${pad(Math.floor(adrTimeLeft/60))}:${pad(adrTimeLeft%60)}`;
-                if(adrTimeLeft < 10) document.getElementById('adr-container').classList.add('adr-flash');
-                else document.getElementById('adr-container').classList.remove('adr-flash');
-            }
-            if(cycleSecs < 10) document.getElementById('cycle-box').classList.add('alert-flash');
-            else document.getElementById('cycle-box').classList.remove('alert-flash');
+            if(adrActive) document.getElementById('t-adr').innerText = `${pad(Math.floor(adrSecs/60))}:${pad(adrSecs%60)}`;
+            if(cycleSecs < 10) document.getElementById('cycle-box').classList.add('alert-flash'); else document.getElementById('cycle-box').classList.remove('alert-flash');
+            if(adrActive && adrSecs < 10) document.getElementById('adr-container').classList.add('adr-flash'); else document.getElementById('adr-container').classList.remove('adr-flash');
+        }
+
+        function toggleSelect(btn, action, qty) {
+            btn.classList.toggle('selected-item');
+            const idx = selectedBuffer.findIndex(i => i.action === action && i.qty === qty);
+            idx > -1 ? selectedBuffer.splice(idx, 1) : selectedBuffer.push({ action, qty });
+        }
+
+        function confirmMultiple(modalId, contId) {
+            selectedBuffer.forEach(i => logAction(i.action, i.qty));
+            closeAndClear(modalId, contId);
+        }
+
+        function closeAndClear(mId, cId) {
+            selectedBuffer = [];
+            document.querySelectorAll(`#${cId} button`).forEach(b => b.classList.remove('selected-item'));
+            toggleModal(mId);
         }
 
         function showToast(msg, type) {
-            const toast = document.getElementById('toast');
+            const t = document.getElementById('toast');
             document.getElementById('toast-msg').innerText = msg;
-            toast.style.backgroundColor = (type === "red") ? "#ef4444" : "#f97316";
-            toast.style.opacity = "1";
-            setTimeout(() => toast.style.opacity = "0", 3500);
+            t.style.backgroundColor = type === "red" ? "#ef4444" : "#f97316";
+            t.style.opacity = "1";
+            setTimeout(() => t.style.opacity = "0", 3500);
             if (audioCtx) {
-                if(type === "red") { playBeep(880, 0.2); setTimeout(() => playBeep(880, 0.4), 300); }
-                else { playBeep(1100, 0.15); setTimeout(() => playBeep(1100, 0.15), 200); setTimeout(() => playBeep(1100, 0.3), 400); }
+                const f = type === "red" ? 880 : 1100;
+                [0, 0.2, 0.4].forEach(d => { setTimeout(() => playBeep(f, 0.3), d * 1000); });
             }
         }
 
-        function playBeep(freq, duration) {
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.connect(gain); gain.connect(audioCtx.destination);
-            osc.frequency.value = freq; osc.type = "square";
-            gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
-            osc.start(); osc.stop(audioCtx.currentTime + duration);
+        function playBeep(f, d) {
+            const o = audioCtx.createOscillator(); const g = audioCtx.createGain();
+            o.connect(g); g.connect(audioCtx.destination);
+            o.frequency.value = f; o.type = "square";
+            g.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + d);
+            o.start(); o.stop(audioCtx.currentTime + d);
         }
 
-        function toggleModal(id) { document.getElementById(id).classList.toggle('hidden'); if(id === 'history-modal') loadHistory(); }
-        function logIntub(device, size) { logAction(device, 'Mida: ' + size); toggleModal('intubacio-modal'); }
+        function toggleModal(id) { document.getElementById(id).classList.toggle('hidden'); }
+        function toggleAdrLimit() { adrLimitSecs = adrLimitSecs === 180 ? 120 : 180; document.getElementById('adr-limit-val').innerText = adrLimitSecs/60; adrSecs = adrLimitSecs; }
         function logRitme(r) { logAction('Ritme: ' + r); toggleModal('ritme-modal'); }
-        function toggleAdrLimit() { adrLimitSecs = (adrLimitSecs === 180) ? 120 : 180; document.getElementById('adr-limit-val').innerText = adrLimitSecs / 60; adrTimeLeft = adrLimitSecs; updateUI(); }
-        function toggleHT(c) { const b = document.getElementById('btn-' + c); b.classList.toggle('cause-selected'); logAction('Causa: ' + c, b.classList.contains('cause-selected') ? 'SI' : 'NO'); }
-        function confirmStop() { if(!active) return; clearInterval(timer); document.getElementById('stop-modal').classList.remove('hidden'); }
-        function resumeCPR() { document.getElementById('stop-modal').classList.add('hidden'); active = false; startCPR(); }
-        function saveAndReset() { location.reload(); }
-        function saveNote() { const val = document.getElementById('note-input').value; if(val) { logAction("NOTA: " + val); document.getElementById('note-input').value = ''; toggleModal('notes-modal'); } }
+        function confirmStop() { if(active) location.reload(); }
 
-        // Botons Tubs dinàmics
+        // Botons Tubs
         const tContainer = document.getElementById('tube-btns');
         [5.0, 5.5, 6.0, 6.5, 7.0, 7.5, 8.0, 8.5].forEach(m => {
             const b = document.createElement('button');
-            b.className = "bg-blue-600 text-white py-2 rounded-lg text-[10px] font-bold";
-            b.innerText = m; b.onclick = () => logIntub('Tubo ET', m);
+            b.className = "bg-slate-50 py-2 rounded-lg text-[10px] font-bold border";
+            b.innerText = m; b.onclick = function() { toggleSelect(this, 'Tubo ET', m); };
             tContainer.appendChild(b);
         });
-
-        function loadHistory() { /* ... Lògica d'historial existent ... */ }
     </script>
 </body>
 </html>
