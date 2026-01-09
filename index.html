@@ -96,6 +96,20 @@
         <button onclick="toggleModal('history-modal')" class="bg-slate-800 text-white p-4 rounded-xl font-bold text-[11px] btn-press uppercase col-span-2 text-center shadow-lg">Consultar Historial</button>
     </div>
 
+    <div id="ritme-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-6 z-[200]">
+        <div class="bg-white rounded-3xl w-full max-w-sm p-6 text-center shadow-2xl">
+            <h2 class="text-xs font-bold mb-6 uppercase text-slate-400">Seleccionar Ritme</h2>
+            <div class="grid grid-cols-2 gap-2 mb-6">
+                <button onclick="logRitme('AESP')" class="bg-slate-500 text-white py-3 rounded-xl font-bold text-[11px]">AESP</button>
+                <button onclick="logRitme('Asistòlia')" class="bg-slate-500 text-white py-3 rounded-xl font-bold text-[11px]">Asistòlia</button>
+                <button onclick="logRitme('FV')" class="bg-blue-600 text-white py-3 rounded-xl font-bold text-[11px]">FV</button>
+                <button onclick="logRitme('TVsp')" class="bg-blue-600 text-white py-3 rounded-xl font-bold text-[11px]">TVsp</button>
+            </div>
+            <button onclick="logRitme('RECUPERA RITMO')" class="w-full bg-green-600 text-white py-3 rounded-xl font-bold text-[11px] mb-4 uppercase">RECUPERA RITMO</button>
+            <button onclick="toggleModal('ritme-modal')" class="text-slate-400 font-bold text-[10px] uppercase">Tancar</button>
+        </div>
+    </div>
+
     <div id="sri-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-6 z-[200]">
         <div class="bg-white rounded-3xl w-full max-w-sm p-6 shadow-2xl overflow-y-auto max-h-[80vh]">
             <h2 class="text-xs font-bold text-slate-800 mb-6 text-center uppercase">Fàrmacs SRI</h2>
@@ -107,7 +121,7 @@
                 <button onclick="toggleSelect(this, 'Etomidat', '0.3 mg/kg')" class="bg-slate-50 py-3 rounded-xl text-[11px] font-bold flex justify-between px-4 border"><span>Etomidat</span> <span>0.3 mg/kg</span></button>
                 <button onclick="toggleSelect(this, 'Midazolam', '0.3 mg/kg')" class="bg-slate-50 py-3 rounded-xl text-[11px] font-bold flex justify-between px-4 border"><span>Midazolam</span> <span>0.3 mg/kg</span></button>
             </div>
-            <button onclick="confirmMultiple('sri-modal', 'sri-options')" class="w-full bg-blue-700 text-white py-4 rounded-full font-bold text-xs uppercase mb-2 shadow-lg">Acceptar</button>
+            <button onclick="confirmMultiple('sri-modal', 'sri-options')" class="w-full bg-blue-700 text-white py-4 rounded-full font-bold text-xs uppercase mb-2 shadow-lg tracking-wider">Acceptar</button>
             <button onclick="closeAndClear('sri-modal', 'sri-options')" class="w-full text-slate-400 font-bold text-xs uppercase py-2">Tancar</button>
         </div>
     </div>
@@ -125,14 +139,14 @@
                     <button onclick="toggleSelect(this, 'IGEL', '5')" class="bg-slate-50 py-3 rounded-lg text-[11px] font-bold border">5</button>
                 </div>
             </div>
-            <button onclick="confirmMultiple('intubacio-modal', 'airway-options')" class="w-full bg-blue-700 text-white py-4 rounded-full font-bold text-xs uppercase mb-2 shadow-lg">Acceptar</button>
+            <button onclick="confirmMultiple('intubacio-modal', 'airway-options')" class="w-full bg-blue-700 text-white py-4 rounded-full font-bold text-xs uppercase mb-2 shadow-lg tracking-wider">Acceptar</button>
             <button onclick="closeAndClear('intubacio-modal', 'airway-options')" class="w-full text-slate-400 font-bold text-xs uppercase py-2">Tancar</button>
         </div>
     </div>
 
     <div id="ht-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-6 z-[200]">
         <div class="bg-white rounded-3xl w-full max-w-sm p-6 shadow-2xl overflow-y-auto max-h-[80vh]">
-            <h2 class="text-xs font-bold text-slate-800 mb-6 text-center uppercase">Causes Reversibles</h2>
+            <h2 class="text-xs font-bold text-slate-800 mb-6 text-center uppercase tracking-widest">Causes Reversibles</h2>
             <div class="grid grid-cols-2 gap-2 mb-6" id="ht-options">
                 <button onclick="toggleSelect(this, 'Hipovolèmia', 'SI')" class="bg-slate-50 py-3 rounded-full text-[10px] font-bold border">Hipovolèmia</button>
                 <button onclick="toggleSelect(this, 'Hipòxia', 'SI')" class="bg-slate-50 py-3 rounded-full text-[10px] font-bold border">Hipòxia</button>
@@ -143,30 +157,16 @@
                 <button onclick="toggleSelect(this, 'Tòxics', 'SI')" class="bg-slate-50 py-3 rounded-full text-[10px] font-bold border">Tòxics</button>
                 <button onclick="toggleSelect(this, 'Trombosi', 'SI')" class="bg-slate-50 py-3 rounded-full text-[10px] font-bold border">Trombosi</button>
             </div>
-            <button onclick="confirmMultiple('ht-modal', 'ht-options')" class="w-full bg-blue-700 text-white py-4 rounded-full font-bold text-xs uppercase mb-2 shadow-lg">Acceptar</button>
+            <button onclick="confirmMultiple('ht-modal', 'ht-options')" class="w-full bg-blue-700 text-white py-4 rounded-full font-bold text-xs uppercase mb-2 shadow-lg tracking-wider">Acceptar</button>
             <button onclick="closeAndClear('ht-modal', 'ht-options')" class="w-full text-slate-400 font-bold text-xs uppercase py-2">Tancar</button>
-        </div>
-    </div>
-
-    <div id="ritme-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-6 z-[200]">
-        <div class="bg-white rounded-3xl w-full max-w-sm p-6 text-center shadow-2xl">
-            <h2 class="text-xs font-bold mb-6 uppercase">Ritme</h2>
-            <div class="grid grid-cols-2 gap-2 mb-6">
-                <button onclick="logRitme('AESP')" class="bg-slate-500 text-white py-3 rounded-xl font-bold text-[11px]">AESP</button>
-                <button onclick="logRitme('Asistòlia')" class="bg-slate-500 text-white py-3 rounded-xl font-bold text-[11px]">Asistòlia</button>
-                <button onclick="logRitme('FV')" class="bg-blue-600 text-white py-3 rounded-xl font-bold text-[11px]">FV</button>
-                <button onclick="logRitme('TVsp')" class="bg-blue-600 text-white py-3 rounded-xl font-bold text-[11px]">TVsp</button>
-            </div>
-            <button onclick="logRitme('ROSC')" class="w-full bg-green-600 text-white py-3 rounded-xl font-bold text-[11px] mb-4 uppercase">ROSC</button>
-            <button onclick="toggleModal('ritme-modal')" class="text-slate-400 font-bold text-xs uppercase">Tancar</button>
         </div>
     </div>
 
     <div id="history-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-6 z-[300]">
         <div class="bg-white rounded-3xl w-full max-w-sm p-6 h-[80vh] flex flex-col shadow-2xl">
-            <h2 class="text-xs font-bold mb-4 uppercase text-center tracking-widest">Historial SAMU</h2>
+            <h2 class="text-xs font-bold mb-4 uppercase text-center tracking-widest text-slate-400">Historial SAMU</h2>
             <div id="history-list" class="flex-1 overflow-y-auto space-y-3 mb-4"></div>
-            <button onclick="toggleModal('history-modal')" class="w-full bg-blue-700 text-white py-3 rounded-full font-bold text-xs uppercase">Tancar</button>
+            <button onclick="toggleModal('history-modal')" class="w-full bg-blue-700 text-white py-3 rounded-full font-bold text-xs uppercase tracking-wider">Tancar</button>
         </div>
     </div>
 
@@ -175,8 +175,8 @@
             <h2 class="text-xs font-bold mb-4 uppercase">Escriure Nota</h2>
             <textarea id="note-input" rows="4" class="w-full border p-3 rounded-xl mb-4 text-sm outline-none focus:border-blue-400" placeholder="Escriu la nota aquí..."></textarea>
             <div class="flex gap-2">
-                <button onclick="saveNote()" class="flex-1 bg-blue-700 text-white py-3 rounded-full font-bold text-xs uppercase">Guardar</button>
-                <button onclick="toggleModal('notes-modal')" class="flex-1 bg-slate-100 py-3 rounded-full font-bold text-xs uppercase text-slate-500">Tancar</button>
+                <button onclick="saveNote()" class="flex-1 bg-blue-700 text-white py-3 rounded-full font-bold text-xs uppercase tracking-wider">Guardar</button>
+                <button onclick="toggleModal('notes-modal')" class="flex-1 bg-slate-100 py-3 rounded-full font-bold text-xs uppercase text-slate-500 tracking-wider">Tancar</button>
             </div>
         </div>
     </div>
@@ -184,7 +184,7 @@
     <div id="stop-modal" class="hidden fixed inset-0 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-6 z-[400]">
         <div class="bg-white rounded-3xl w-full max-w-sm p-6 text-center shadow-2xl">
             <h2 class="text-lg font-black uppercase mb-4 text-red-600">Aturar RCP?</h2>
-            <button onclick="saveAndReset()" class="w-full bg-red-600 text-white py-4 rounded-2xl font-bold uppercase shadow-lg mb-2">Guardar i Sortir</button>
+            <button onclick="saveAndReset()" class="w-full bg-red-600 text-white py-4 rounded-2xl font-bold uppercase shadow-lg mb-2 tracking-widest">Guardar i Sortir</button>
             <button onclick="toggleModal('stop-modal')" class="w-full bg-slate-100 py-4 rounded-2xl font-bold uppercase tracking-widest text-slate-600">TORNAR</button>
         </div>
     </div>
@@ -197,7 +197,6 @@
         let audioCtx = null;
         let selectedBuffer = [];
 
-        // LÒGICA DE RECOMPTE I REGISTRE
         function logAction(action, qty = '-', countType = null) {
             if(!active) startCPR();
             const time = document.getElementById('t-total').innerText;
@@ -253,7 +252,6 @@
             }
         }
 
-        // CONTROL D'ADRENALINA
         function logAdrenalina() {
             logAction('Adrenalina', '1 mg', 'adr');
             if (!adrActive) {
@@ -270,7 +268,6 @@
             adrSecs = adrLimitSecs;
         }
 
-        // TIMERS
         function startCPR() {
             if(active) return; active = true;
             if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -313,7 +310,6 @@
             o.start(); o.stop(audioCtx.currentTime + d);
         }
 
-        // MULTI-SELECCIÓ
         function toggleSelect(btn, action, qty) {
             btn.classList.toggle('selected-item');
             const idx = selectedBuffer.findIndex(i => i.action === action && i.qty === qty);
@@ -332,10 +328,15 @@
         }
 
         function toggleModal(id) { document.getElementById(id).classList.toggle('hidden'); if(id === 'history-modal') loadHistory(); }
-        function logRitme(r) { logAction('Ritme: ' + r); toggleModal('ritme-modal'); }
+        
+        function logRitme(r) { 
+            logAction('Ritme: ' + r); 
+            // Si recupera ritmo, se suele parar el crono de ciclos, pero lo mantengo por seguridad técnica
+            toggleModal('ritme-modal'); 
+        }
+
         function confirmStop() { if(active) document.getElementById('stop-modal').classList.remove('hidden'); }
 
-        // HISTORIAL
         function saveAndReset() {
             const session = { id: Date.now(), date: new Date().toLocaleString(), duration: document.getElementById('t-total').innerText, cycles: cycles, log: [...sessionLog], stats: {...counts} };
             let history = JSON.parse(localStorage.getItem('rcp_history') || '[]');
@@ -347,7 +348,7 @@
         function loadHistory() {
             const h = JSON.parse(localStorage.getItem('rcp_history') || '[]');
             const list = document.getElementById('history-list');
-            if (h.length === 0) { list.innerHTML = "<p class='text-center py-10 opacity-30 uppercase text-xs font-bold'>Sense registres</p>"; return; }
+            if (h.length === 0) { list.innerHTML = "<p class='text-center py-10 opacity-30 uppercase text-[9px] font-bold'>Sense registres</p>"; return; }
             list.innerHTML = h.map(s => `
                 <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200 text-[10px] shadow-sm mb-3">
                     <div class="flex justify-between items-start mb-2 uppercase">
@@ -371,7 +372,6 @@
         function deleteHistoryEntry(id) { if(confirm("Eliminar permanentment?")) { let h = JSON.parse(localStorage.getItem('rcp_history') || '[]'); h = h.filter(s => s.id !== id); localStorage.setItem('rcp_history', JSON.stringify(h)); loadHistory(); } }
         function editHistoryEntry(id) { let h = JSON.parse(localStorage.getItem('rcp_history') || '[]'); const entry = h.find(s => s.id === id); const newName = prompt("Nou nom:", entry.date); if (newName) { entry.date = newName; localStorage.setItem('rcp_history', JSON.stringify(h)); loadHistory(); } }
 
-        // Tubs ET
         window.onload = function() {
             const tContainer = document.getElementById('tube-btns');
             [5.0, 5.5, 6.0, 6.5, 7.0, 7.5, 8.0, 8.5].forEach(m => {
