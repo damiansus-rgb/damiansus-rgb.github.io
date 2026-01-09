@@ -43,9 +43,15 @@
             <p class="text-[8px] font-bold text-slate-400 uppercase mb-1">Revisió en:</p>
             <span id="t-cycle" class="text-2xl font-mono font-black text-blue-600 tracking-tighter">02:00</span>
         </div>
-        <div class="p-3">
-            <p class="text-[8px] font-bold text-slate-400 uppercase mb-1">Cicle Actual</p>
-            <span id="cycle-count" class="text-2xl font-mono font-black">1</span>
+        <div class="p-3 flex flex-col justify-center items-center">
+            <div id="adr-container" class="hidden text-center cursor-pointer" onclick="toggleAdrLimit()">
+                <p class="text-[7px] font-bold text-orange-500 uppercase">Adrenalina (<span id="adr-limit-val">3</span>')</p>
+                <span id="t-adr" class="text-lg font-mono font-black text-orange-600">03:00</span>
+            </div>
+            <div id="cycle-count-container">
+                <p class="text-[8px] font-bold text-slate-400 uppercase mb-1">Cicle Actual</p>
+                <span id="cycle-count" class="text-2xl font-mono font-black">1</span>
+            </div>
         </div>
     </div>
 
@@ -71,7 +77,7 @@
 
     <div class="bg-white p-4 grid grid-cols-2 gap-2 pb-10 shadow-2xl shrink-0">
         <button onclick="toggleModal('ritme-modal')" class="bg-blue-700 text-white p-4 rounded-xl font-bold text-[11px] btn-press uppercase shadow-md">Ritmes</button>
-        <button onclick="logAction('Adrenalina', '1 mg'); updateCount('adr')" class="bg-blue-700 text-white p-4 rounded-xl font-bold text-[11px] btn-press uppercase shadow-md">Adrenalina</button>
+        <button onclick="logAdrenalina()" class="bg-blue-700 text-white p-4 rounded-xl font-bold text-[11px] btn-press uppercase shadow-md">Adrenalina</button>
         <button onclick="logAction('Descàrrega', '200J'); updateCount('shock')" class="bg-blue-700 text-white p-4 rounded-xl font-bold text-[11px] btn-press uppercase shadow-md">Descàrrega</button>
         <button onclick="logAction('Amiodarona', '300 mg'); updateCount('amio')" class="bg-blue-700 text-white p-4 rounded-xl font-bold text-[11px] btn-press uppercase shadow-md">Amiodarona</button>
         <button onclick="toggleModal('intubacio-modal')" class="bg-blue-100 text-blue-800 p-4 rounded-xl font-bold text-[11px] btn-press uppercase">Vía Aèria</button>
@@ -82,24 +88,28 @@
     </div>
 
     <div id="history-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-6 z-[120]">
-        <div class="bg-white rounded-3xl w-full max-w-sm p-6 h-[80vh] flex flex-col shadow-2xl">
-            <h2 class="text-xs font-bold mb-4 uppercase text-center tracking-widest">Historial</h2>
+        <div class="bg-white rounded-3xl w-full max-w-sm p-6 h-[80vh] flex flex-col shadow-2xl text-slate-800">
+            <h2 class="text-xs font-bold mb-4 uppercase text-center tracking-widest text-slate-400">Historial de Registres</h2>
             <div id="history-list" class="flex-1 overflow-y-auto space-y-3 mb-4"></div>
-            <button onclick="toggleModal('history-modal')" class="w-full bg-blue-700 text-white py-3 rounded-full font-bold text-xs uppercase">Tancar</button>
+            <button onclick="toggleModal('history-modal')" class="w-full bg-blue-700 text-white py-3 rounded-full font-bold text-xs uppercase shadow-md">Tancar</button>
         </div>
     </div>
 
     <div id="intubacio-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-6 z-[115]">
         <div class="bg-white rounded-3xl w-full max-w-sm p-6 shadow-2xl">
-            <h2 class="text-xs font-bold text-slate-800 mb-6 text-center uppercase">Vía Aèria</h2>
-            <div class="space-y-4 text-center" id="tube-buttons-container">
-                <p class="text-[10px] font-bold text-slate-400 uppercase mb-2">TUBO ET (Mida)</p>
-                <div class="grid grid-cols-4 gap-2" id="tube-btns"></div>
-                <p class="text-[10px] font-bold text-slate-400 uppercase mt-4 mb-2">IGEL (Mida)</p>
-                <div class="grid grid-cols-3 gap-2">
-                    <button onclick="logIntub('IGEL', '3')" class="bg-indigo-600 text-white py-3 rounded-lg text-[11px] font-bold">3</button>
-                    <button onclick="logIntub('IGEL', '4')" class="bg-indigo-600 text-white py-3 rounded-lg text-[11px] font-bold">4</button>
-                    <button onclick="logIntub('IGEL', '5')" class="bg-indigo-600 text-white py-3 rounded-lg text-[11px] font-bold">5</button>
+            <h2 class="text-xs font-bold text-slate-800 mb-6 text-center uppercase">Dispositiu Vía Aèria</h2>
+            <div class="space-y-4 text-center">
+                <div>
+                    <p class="text-[10px] font-bold text-slate-400 uppercase mb-2">TUBO ET (Mida)</p>
+                    <div class="grid grid-cols-4 gap-2" id="tube-btns"></div>
+                </div>
+                <div>
+                    <p class="text-[10px] font-bold text-slate-400 uppercase mb-2">IGEL (Mida)</p>
+                    <div class="grid grid-cols-3 gap-2">
+                        <button onclick="logIntub('IGEL', '3')" class="bg-indigo-600 text-white py-3 rounded-lg text-[11px] font-bold btn-press">3</button>
+                        <button onclick="logIntub('IGEL', '4')" class="bg-indigo-600 text-white py-3 rounded-lg text-[11px] font-bold btn-press">4</button>
+                        <button onclick="logIntub('IGEL', '5')" class="bg-indigo-600 text-white py-3 rounded-lg text-[11px] font-bold btn-press">5</button>
+                    </div>
                 </div>
             </div>
             <button onclick="toggleModal('intubacio-modal')" class="w-full mt-6 bg-slate-100 py-3 rounded-full font-bold text-xs uppercase text-slate-500">Cancel·la</button>
@@ -108,51 +118,51 @@
 
     <div id="ht-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-6 z-[115]">
         <div class="bg-white rounded-3xl w-full max-w-sm p-6 shadow-2xl overflow-y-auto max-h-[90vh]">
-            <h2 class="text-xs font-bold text-slate-800 mb-6 text-center uppercase">Causes Reversibles</h2>
-            <div class="grid grid-cols-2 gap-2 mb-6">
-                <button id="btn-Hipovolèmia" onclick="toggleHT('Hipovolèmia')" class="bg-blue-900 text-white py-3 rounded-full text-[10px] font-bold">Hipovolèmia</button>
-                <button id="btn-Hipotèrmia" onclick="toggleHT('Hipotèrmia')" class="bg-blue-900 text-white py-3 rounded-full text-[10px] font-bold">Hipotèrmia</button>
-                <button id="btn-Hipòxia" onclick="toggleHT('Hipòxia')" class="bg-blue-900 text-white py-3 rounded-full text-[10px] font-bold">Hipòxia</button>
-                <button id="btn-Hidroelectròlits" onclick="toggleHT('Hidroelectròlits')" class="bg-blue-900 text-white py-3 rounded-full text-[10px] font-bold">Hidroelectròlits</button>
-                <button id="btn-Pneumotòrax" onclick="toggleHT('Pneumotòrax')" class="bg-blue-900 text-white py-3 rounded-full text-[10px] font-bold">Pneumotòrax</button>
-                <button id="btn-Taponament" onclick="toggleHT('Taponament')" class="bg-blue-900 text-white py-3 rounded-full text-[10px] font-bold">Taponament</button>
-                <button id="btn-Tòxics" onclick="toggleHT('Tòxics')" class="bg-blue-900 text-white py-3 rounded-full text-[10px] font-bold">Tòxics</button>
-                <button id="btn-Trombosi" onclick="toggleHT('Trombosi')" class="bg-blue-900 text-white py-3 rounded-full text-[10px] font-bold">Trombosi</button>
+            <h2 class="text-xs font-bold text-slate-800 mb-6 text-center uppercase tracking-tight">Causa Reversible</h2>
+            <div class="grid grid-cols-2 gap-2 mb-6 text-center">
+                <button id="btn-Hipovolèmia" onclick="toggleHT('Hipovolèmia')" class="bg-blue-900 text-white py-3 rounded-full text-[10px] font-bold btn-press">Hipovolèmia</button>
+                <button id="btn-Hipotèrmia" onclick="toggleHT('Hipotèrmia')" class="bg-blue-900 text-white py-3 rounded-full text-[10px] font-bold btn-press">Hipotèrmia</button>
+                <button id="btn-Hipòxia" onclick="toggleHT('Hipòxia')" class="bg-blue-900 text-white py-3 rounded-full text-[10px] font-bold btn-press">Hipòxia</button>
+                <button id="btn-Hidroelectròlits" onclick="toggleHT('Hidroelectròlits')" class="bg-blue-900 text-white py-3 rounded-full text-[10px] font-bold btn-press">Hidroelectròlits</button>
+                <button id="btn-Pneumotòrax" onclick="toggleHT('Pneumotòrax')" class="bg-blue-900 text-white py-3 rounded-full text-[10px] font-bold btn-press leading-tight">Pneumotòrax Tensió</button>
+                <button id="btn-Taponament" onclick="toggleHT('Taponament')" class="bg-blue-900 text-white py-3 rounded-full text-[10px] font-bold btn-press">Taponament</button>
+                <button id="btn-Tòxics" onclick="toggleHT('Tòxics')" class="bg-blue-900 text-white py-3 rounded-full text-[10px] font-bold btn-press">Tòxics</button>
+                <button id="btn-Trombosi" onclick="toggleHT('Trombosi')" class="bg-blue-900 text-white py-3 rounded-full text-[10px] font-bold btn-press leading-tight">Trombosi (IAM/TEP)</button>
             </div>
-            <button onclick="toggleModal('ht-modal')" class="w-full bg-blue-700 text-white py-4 rounded-full font-bold text-xs uppercase">Acceptar</button>
+            <button onclick="toggleModal('ht-modal')" class="w-full bg-blue-700 text-white py-4 rounded-full font-bold text-xs uppercase shadow-lg">Acceptar</button>
         </div>
     </div>
 
     <div id="ritme-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-6 z-[115]">
         <div class="bg-white rounded-3xl w-full max-w-sm p-6 text-center shadow-2xl">
-            <h2 class="text-xs font-bold mb-6 uppercase">Ritme</h2>
+            <h2 class="text-xs font-bold mb-6 uppercase">Tipus de Ritme</h2>
             <div class="grid grid-cols-2 gap-2 mb-6">
-                <button onclick="logRitme('AESP')" class="bg-slate-500 text-white py-3 rounded-full text-[11px] font-bold">AESP</button>
-                <button onclick="logRitme('Asistòlia')" class="bg-slate-500 text-white py-3 rounded-full text-[11px] font-bold">Asistòlia</button>
-                <button onclick="logRitme('FV')" class="bg-blue-600 text-white py-3 rounded-full text-[11px] font-bold">FV</button>
-                <button onclick="logRitme('TVsp')" class="bg-blue-600 text-white py-3 rounded-full text-[11px] font-bold">TVsp</button>
+                <button onclick="logRitme('AESP')" class="bg-slate-500 text-white py-3 rounded-full text-[11px] font-bold btn-press">AESP</button>
+                <button onclick="logRitme('Asistòlia')" class="bg-slate-500 text-white py-3 rounded-full text-[11px] font-bold btn-press">Asistòlia</button>
+                <button onclick="logRitme('FV')" class="bg-blue-600 text-white py-3 rounded-full text-[11px] font-bold btn-press">FV</button>
+                <button onclick="logRitme('TVsp')" class="bg-blue-600 text-white py-3 rounded-full text-[11px] font-bold btn-press">TVsp</button>
             </div>
-            <button onclick="logRitme('ROSC')" class="w-full bg-green-600 text-white py-3 rounded-full text-[11px] font-bold mb-4 uppercase">ROSC</button>
+            <button onclick="logRitme('ROSC')" class="w-full bg-green-600 text-white py-3 rounded-full text-[11px] font-bold mb-4 uppercase shadow-md">ROSC</button>
             <button onclick="toggleModal('ritme-modal')" class="text-slate-400 font-bold text-xs uppercase">Tancar</button>
-        </div>
-    </div>
-
-    <div id="stop-modal" class="hidden fixed inset-0 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-6 z-[150]">
-        <div class="bg-white rounded-3xl w-full max-w-sm p-6 text-center">
-            <h2 class="text-lg font-black uppercase mb-4">Aturar RCP?</h2>
-            <button onclick="saveAndReset()" class="w-full bg-red-600 text-white py-4 rounded-2xl font-bold uppercase mb-2">Guardar i Sortir</button>
-            <button onclick="resumeCPR()" class="w-full bg-slate-100 py-4 rounded-2xl font-bold uppercase text-slate-600">Tornar</button>
         </div>
     </div>
 
     <div id="notes-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-6 z-[115]">
         <div class="bg-white rounded-3xl w-full max-w-sm p-6 shadow-2xl">
-            <h2 class="text-xs font-bold mb-4 uppercase">Nota</h2>
-            <textarea id="note-input" rows="4" class="w-full border p-3 rounded-xl mb-4 text-sm" placeholder="Escriu aquí..."></textarea>
+            <h2 class="text-xs font-bold mb-4 uppercase">Nota de Registre</h2>
+            <textarea id="note-input" rows="4" class="w-full border p-3 rounded-xl mb-4 text-sm outline-none focus:border-blue-400" placeholder="Escriu aquí..."></textarea>
             <div class="flex gap-2">
-                <button onclick="saveNote()" class="flex-1 bg-blue-700 text-white py-3 rounded-full font-bold text-xs uppercase">Guardar</button>
+                <button onclick="saveNote()" class="flex-1 bg-blue-700 text-white py-3 rounded-full font-bold text-xs uppercase shadow-md">Guardar</button>
                 <button onclick="toggleModal('notes-modal')" class="flex-1 bg-slate-100 py-3 rounded-full font-bold text-xs uppercase text-slate-500">Tancar</button>
             </div>
+        </div>
+    </div>
+
+    <div id="stop-modal" class="hidden fixed inset-0 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-6 z-[150]">
+        <div class="bg-white rounded-3xl w-full max-w-sm p-6 text-center shadow-2xl">
+            <h2 class="text-lg font-black uppercase mb-4">Aturar RCP?</h2>
+            <button onclick="saveAndReset()" class="w-full bg-red-600 text-white py-4 rounded-2xl font-bold uppercase shadow-lg mb-2">Guardar i Finalitzar</button>
+            <button onclick="resumeCPR()" class="w-full bg-slate-100 py-4 rounded-2xl font-bold uppercase tracking-widest text-slate-600">TORNAR</button>
         </div>
     </div>
 
@@ -162,7 +172,37 @@
         let sessionLog = [];
         let audioCtx = null;
 
-        // Generar botones Tubo ET
+        // Lógica Adrenalina
+        let adrActive = false;
+        let adrLimitSecs = 180; // 3 min por defecto
+        let adrTimeLeft = 180;
+
+        function logAdrenalina() {
+            logAction('Adrenalina', '1 mg');
+            updateCount('adr');
+            
+            if (!adrActive) {
+                adrActive = true;
+                document.getElementById('adr-container').classList.remove('hidden');
+                document.getElementById('cycle-count-container').classList.add('hidden');
+            }
+            // Resetear el contador cada vez que se pulsa
+            adrTimeLeft = adrLimitSecs;
+        }
+
+        function toggleAdrLimit() {
+            if (adrLimitSecs === 180) {
+                adrLimitSecs = 120;
+                document.getElementById('adr-limit-val').innerText = "2";
+            } else {
+                adrLimitSecs = 180;
+                document.getElementById('adr-limit-val').innerText = "3";
+            }
+            // Opción: Resetear tiempo al cambiar o dejar que siga el descuento
+            adrTimeLeft = adrLimitSecs;
+            updateUI();
+        }
+
         const tContainer = document.getElementById('tube-btns');
         [5.0, 5.5, 6.0, 6.5, 7.0, 7.5, 8.0, 8.5].forEach(m => {
             const b = document.createElement('button');
@@ -189,18 +229,19 @@
                     <span class="w-20 text-slate-400 font-mono text-[10px]">${e.time}</span>
                     <span class="flex-1 px-2 uppercase text-center tracking-tight">${e.action}</span>
                     <span class="w-16 text-right">${e.qty}</span>
-                </div>
-            `).reverse().join('');
+                </div>`).reverse().join('');
         }
 
         function startCPR() {
             if(active) return;
             active = true;
-            // Inicializar Audio Context en la primera interacción para iOS
             if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
             
             timer = setInterval(() => {
-                totalSecs++; cycleSecs--;
+                totalSecs++; 
+                cycleSecs--;
+                if(adrActive) adrTimeLeft--;
+
                 if(cycleSecs <= 0) {
                     showToast();
                     cycleSecs = 120; cycles++;
@@ -208,6 +249,12 @@
                     document.getElementById('count-cicles').innerText = cycles;
                     logAction(`CICLE ${cycles} INICIAT`, '-');
                 }
+
+                // Reinicio automático de adrenalina al llegar a 0 (opcional, suele ser aviso)
+                if(adrActive && adrTimeLeft < 0) {
+                    adrTimeLeft = adrLimitSecs;
+                }
+
                 updateUI();
             }, 1000);
         }
@@ -216,19 +263,23 @@
             const pad = (n) => n.toString().padStart(2,'0');
             document.getElementById('t-total').innerText = `${pad(Math.floor(totalSecs/3600))}:${pad(Math.floor((totalSecs%3600)/60))}:${pad(totalSecs%60)}`;
             document.getElementById('t-cycle').innerText = `${pad(Math.floor(cycleSecs/60))}:${pad(cycleSecs%60)}`;
+            
+            if(adrActive) {
+                const am = Math.floor(adrTimeLeft / 60);
+                const as = adrTimeLeft % 60;
+                document.getElementById('t-adr').innerText = `${pad(am)}:${pad(as)}`;
+            }
+
             if(cycleSecs < 10) document.getElementById('cycle-box').classList.add('alert-flash');
             else document.getElementById('cycle-box').classList.remove('alert-flash');
         }
 
-        // FUNCIÓN DE ALARMA MEJORADA
         function showToast() {
             document.getElementById('toast').style.opacity = "1";
             setTimeout(() => document.getElementById('toast').style.opacity = "0", 3500);
-            
-            // Sonido de Alarma (Doble Beep agudo)
             if (audioCtx) {
-                playBeep(880, 0.2); // Primer beep
-                setTimeout(() => playBeep(880, 0.4), 300); // Segundo beep más largo
+                playBeep(880, 0.2); 
+                setTimeout(() => playBeep(880, 0.4), 300); 
             }
         }
 
@@ -238,7 +289,7 @@
             osc.connect(gain);
             gain.connect(audioCtx.destination);
             osc.frequency.value = freq;
-            osc.type = "square"; // Sonido más tipo "alarma"
+            osc.type = "square";
             gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
             gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
             osc.start();
