@@ -22,14 +22,17 @@
         @keyframes flash { 0%, 100% { background-color: #fee2e2; } 50% { background-color: #ef4444; color: white; } }
         .adr-flash { animation: flash-orange 1s infinite; }
         @keyframes flash-orange { 0%, 100% { background-color: #ffedd5; } 50% { background-color: #f97316; color: white; } }
-        .cause-selected { background-color: #64748b !important; color: white !important; }
+        
+        /* Estil per a selecció múltiple */
+        .selected-item { background-color: #64748b !important; color: white !important; border-color: #475569 !important; }
+        
         #toast { transition: opacity 0.5s ease; pointer-events: none; }
         ::-webkit-scrollbar { display: none; }
     </style>
 </head>
 <body class="bg-slate-100 h-screen flex flex-col overflow-hidden relative text-slate-800">
 
-    <div id="toast" class="opacity-0 fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[100] bg-red-600 text-white px-8 py-4 rounded-3xl shadow-2xl text-center">
+    <div id="toast" class="opacity-0 fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[200] bg-red-600 text-white px-8 py-4 rounded-3xl shadow-2xl text-center">
         <p id="toast-title" class="text-xs font-bold uppercase mb-1">Atenció</p>
         <p id="toast-msg" class="text-2xl font-black uppercase">Revisar Ritme</p>
     </div>
@@ -43,12 +46,12 @@
     </header>
 
     <div id="timer-box" class="bg-white grid grid-cols-3 border-b divide-x text-center shrink-0">
-        <div class="p-3">
+        <div class="p-3 text-center">
             <p class="text-[8px] font-bold text-slate-400 uppercase mb-1">Temps Total</p>
             <span id="t-total" class="text-2xl font-mono font-black tracking-tighter">00:00:00</span>
         </div>
-        <div id="cycle-box" class="p-3">
-            <p class="text-[8px] font-bold text-slate-400 uppercase mb-1">Revisió en:</p>
+        <div id="cycle-box" class="p-3 text-center">
+            <p class="text-[8px] font-bold text-slate-400 uppercase mb-1">Ritme en:</p>
             <span id="t-cycle" class="text-2xl font-mono font-black text-blue-600 tracking-tighter">02:00</span>
         </div>
         <div class="p-3 flex flex-col justify-center items-center">
@@ -65,8 +68,8 @@
 
     <div class="bg-slate-50 px-5 py-2 border-b flex justify-between text-[9px] font-bold text-slate-400 uppercase tracking-widest shrink-0">
         <span class="w-20">Temps</span>
-        <span class="flex-1 px-2 text-center">Valoració / Acció</span>
-        <span class="w-16 text-right">Esborrar</span>
+        <span class="flex-1 px-2 text-center">Acció</span>
+        <span class="w-16 text-right">Quant.</span>
     </div>
 
     <div id="event-log" class="flex-1 overflow-y-auto bg-white">
@@ -95,69 +98,68 @@
         <button onclick="toggleModal('history-modal')" class="bg-slate-800 text-white p-4 rounded-xl font-bold text-[11px] btn-press uppercase col-span-2 text-center shadow-lg">Consultar Historial</button>
     </div>
 
-    <div id="sri-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-6 z-[115]">
+    <div id="sri-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-6 z-[150]">
         <div class="bg-white rounded-3xl w-full max-w-sm p-6 shadow-2xl">
-            <h2 class="text-xs font-bold text-slate-800 mb-6 text-center uppercase tracking-widest">Fàrmacs SRI (Adult)</h2>
-            <div class="grid grid-cols-1 gap-2">
-                <button onclick="logSRI('Rocuroni', '1.2 mg/kg')" class="bg-slate-800 text-white py-3 rounded-xl text-[11px] font-bold btn-press flex justify-between px-4">
+            <h2 class="text-xs font-bold text-slate-800 mb-6 text-center uppercase">Fàrmacs SRI</h2>
+            <div class="grid grid-cols-1 gap-2 mb-6" id="sri-options">
+                <button onclick="toggleSelect(this, 'Rocuroni', '1.2 mg/kg')" class="bg-slate-100 text-slate-800 py-3 rounded-xl text-[11px] font-bold flex justify-between px-4 border border-transparent">
                     <span>Rocuroni</span> <span>1.2 mg/kg</span>
                 </button>
-                <button onclick="logSRI('Propofol', '2 mg/kg')" class="bg-slate-800 text-white py-3 rounded-xl text-[11px] font-bold btn-press flex justify-between px-4">
+                <button onclick="toggleSelect(this, 'Propofol', '2 mg/kg')" class="bg-slate-100 text-slate-800 py-3 rounded-xl text-[11px] font-bold flex justify-between px-4 border border-transparent">
                     <span>Propofol</span> <span>2 mg/kg</span>
                 </button>
-                <button onclick="logSRI('Ketamina', '2 mg/kg')" class="bg-slate-800 text-white py-3 rounded-xl text-[11px] font-bold btn-press flex justify-between px-4">
+                <button onclick="toggleSelect(this, 'Ketamina', '2 mg/kg')" class="bg-slate-100 text-slate-800 py-3 rounded-xl text-[11px] font-bold flex justify-between px-4 border border-transparent">
                     <span>Ketamina</span> <span>2 mg/kg</span>
                 </button>
-                <button onclick="logSRI('Midazolam', '0.3 mg/kg')" class="bg-slate-800 text-white py-3 rounded-xl text-[11px] font-bold btn-press flex justify-between px-4">
+                <button onclick="toggleSelect(this, 'Midazolam', '0.3 mg/kg')" class="bg-slate-100 text-slate-800 py-3 rounded-xl text-[11px] font-bold flex justify-between px-4 border border-transparent">
                     <span>Midazolam</span> <span>0.3 mg/kg</span>
                 </button>
-                <button onclick="logSRI('Etomidat', '0.3 mg/kg')" class="bg-slate-800 text-white py-3 rounded-xl text-[11px] font-bold btn-press flex justify-between px-4">
+                <button onclick="toggleSelect(this, 'Etomidat', '0.3 mg/kg')" class="bg-slate-100 text-slate-800 py-3 rounded-xl text-[11px] font-bold flex justify-between px-4 border border-transparent">
                     <span>Etomidat</span> <span>0.3 mg/kg</span>
                 </button>
             </div>
-            <button onclick="toggleModal('sri-modal')" class="w-full mt-6 bg-slate-100 py-3 rounded-full font-bold text-xs uppercase text-slate-500">Tancar</button>
+            <button onclick="confirmMultiple('sri-modal', 'sri-options')" class="w-full bg-blue-700 text-white py-4 rounded-full font-bold text-xs uppercase shadow-lg mb-2">Acceptar SRI</button>
+            <button onclick="closeAndClear('sri-modal', 'sri-options')" class="w-full bg-slate-100 py-3 rounded-full font-bold text-xs uppercase text-slate-500">Tancar</button>
         </div>
     </div>
 
-    <div id="intubacio-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-6 z-[115]">
+    <div id="intubacio-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-6 z-[150]">
         <div class="bg-white rounded-3xl w-full max-w-sm p-6 shadow-2xl">
-            <h2 class="text-xs font-bold text-slate-800 mb-6 text-center uppercase">Dispositiu Vía Aèria</h2>
-            <div class="space-y-4 text-center">
-                <div>
-                    <p class="text-[10px] font-bold text-slate-400 uppercase mb-2">TUBO ET (Mida)</p>
-                    <div class="grid grid-cols-4 gap-2" id="tube-btns"></div>
-                </div>
-                <div>
-                    <p class="text-[10px] font-bold text-slate-400 uppercase mb-2">IGEL (Mida)</p>
-                    <div class="grid grid-cols-3 gap-2">
-                        <button onclick="logIntub('IGEL', '3')" class="bg-indigo-600 text-white py-3 rounded-lg text-[11px] font-bold btn-press">3</button>
-                        <button onclick="logIntub('IGEL', '4')" class="bg-indigo-600 text-white py-3 rounded-lg text-[11px] font-bold btn-press">4</button>
-                        <button onclick="logIntub('IGEL', '5')" class="bg-indigo-600 text-white py-3 rounded-lg text-[11px] font-bold btn-press">5</button>
-                    </div>
+            <h2 class="text-xs font-bold text-slate-800 mb-6 text-center uppercase">Vía Aèria</h2>
+            <div id="airway-options">
+                <p class="text-[10px] font-bold text-slate-400 uppercase mb-2 text-center">TUBO ET</p>
+                <div class="grid grid-cols-4 gap-2 mb-4" id="tube-btns"></div>
+                <p class="text-[10px] font-bold text-slate-400 uppercase mb-2 text-center">IGEL</p>
+                <div class="grid grid-cols-3 gap-2 mb-6">
+                    <button onclick="toggleSelect(this, 'IGEL', '3')" class="bg-slate-100 py-3 rounded-lg text-[11px] font-bold border border-transparent">3</button>
+                    <button onclick="toggleSelect(this, 'IGEL', '4')" class="bg-slate-100 py-3 rounded-lg text-[11px] font-bold border border-transparent">4</button>
+                    <button onclick="toggleSelect(this, 'IGEL', '5')" class="bg-slate-100 py-3 rounded-lg text-[11px] font-bold border border-transparent">5</button>
                 </div>
             </div>
-            <button onclick="toggleModal('intubacio-modal')" class="w-full mt-6 bg-slate-100 py-3 rounded-full font-bold text-xs uppercase text-slate-500">Cancel·la</button>
+            <button onclick="confirmMultiple('intubacio-modal', 'airway-options')" class="w-full bg-blue-700 text-white py-4 rounded-full font-bold text-xs uppercase shadow-lg mb-2">Acceptar Vía Aèria</button>
+            <button onclick="closeAndClear('intubacio-modal', 'airway-options')" class="w-full bg-slate-100 py-3 rounded-full font-bold text-xs uppercase text-slate-500">Tancar</button>
         </div>
     </div>
 
-    <div id="ht-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-6 z-[115]">
+    <div id="ht-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-6 z-[150]">
         <div class="bg-white rounded-3xl w-full max-w-sm p-6 shadow-2xl overflow-y-auto max-h-[90vh]">
-            <h2 class="text-xs font-bold text-slate-800 mb-6 text-center uppercase tracking-tight">Causa Reversible</h2>
-            <div class="grid grid-cols-2 gap-2 mb-6 text-center">
-                <button id="btn-Hipovolèmia" onclick="toggleHT('Hipovolèmia')" class="bg-blue-900 text-white py-3 rounded-full text-[10px] font-bold btn-press">Hipovolèmia</button>
-                <button id="btn-Hipotèrmia" onclick="toggleHT('Hipotèrmia')" class="bg-blue-900 text-white py-3 rounded-full text-[10px] font-bold btn-press">Hipotèrmia</button>
-                <button id="btn-Hipòxia" onclick="toggleHT('Hipòxia')" class="bg-blue-900 text-white py-3 rounded-full text-[10px] font-bold btn-press">Hipòxia</button>
-                <button id="btn-Hidroelectròlits" onclick="toggleHT('Hidroelectròlits')" class="bg-blue-900 text-white py-3 rounded-full text-[10px] font-bold btn-press">Hidroelectròlits</button>
-                <button id="btn-Pneumotòrax" onclick="toggleHT('Pneumotòrax')" class="bg-blue-900 text-white py-3 rounded-full text-[10px] font-bold btn-press leading-tight">Pneumotòrax Tensió</button>
-                <button id="btn-Taponament" onclick="toggleHT('Taponament')" class="bg-blue-900 text-white py-3 rounded-full text-[10px] font-bold btn-press">Taponament</button>
-                <button id="btn-Tòxics" onclick="toggleHT('Tòxics')" class="bg-blue-900 text-white py-3 rounded-full text-[10px] font-bold btn-press">Tòxics</button>
-                <button id="btn-Trombosi" onclick="toggleHT('Trombosi')" class="bg-blue-900 text-white py-3 rounded-full text-[10px] font-bold btn-press leading-tight">Trombosi (IAM/TEP)</button>
+            <h2 class="text-xs font-bold text-slate-800 mb-6 text-center uppercase tracking-tight">Causes Reversibles</h2>
+            <div class="grid grid-cols-2 gap-2 mb-6" id="ht-options">
+                <button onclick="toggleSelect(this, 'H: Hipovolèmia', 'SI')" class="bg-slate-100 py-3 rounded-full text-[10px] font-bold border border-transparent">Hipovolèmia</button>
+                <button onclick="toggleSelect(this, 'H: Hipotèrmia', 'SI')" class="bg-slate-100 py-3 rounded-full text-[10px] font-bold border border-transparent">Hipotèrmia</button>
+                <button onclick="toggleSelect(this, 'H: Hipòxia', 'SI')" class="bg-slate-100 py-3 rounded-full text-[10px] font-bold border border-transparent">Hipòxia</button>
+                <button onclick="toggleSelect(this, 'H: Hidroelectròl.', 'SI')" class="bg-slate-100 py-3 rounded-full text-[10px] font-bold border border-transparent">Hidroelectròlits</button>
+                <button onclick="toggleSelect(this, 'T: Pneumotòrax', 'SI')" class="bg-slate-100 py-3 rounded-full text-[10px] font-bold border border-transparent">Pneumotòrax</button>
+                <button onclick="toggleSelect(this, 'T: Taponament', 'SI')" class="bg-slate-100 py-3 rounded-full text-[10px] font-bold border border-transparent">Taponament</button>
+                <button onclick="toggleSelect(this, 'T: Tòxics', 'SI')" class="bg-slate-100 py-3 rounded-full text-[10px] font-bold border border-transparent">Tòxics</button>
+                <button onclick="toggleSelect(this, 'T: Trombosi', 'SI')" class="bg-slate-100 py-3 rounded-full text-[10px] font-bold border border-transparent">Trombosi</button>
             </div>
-            <button onclick="toggleModal('ht-modal')" class="w-full bg-blue-700 text-white py-4 rounded-full font-bold text-xs uppercase shadow-lg">Acceptar</button>
+            <button onclick="confirmMultiple('ht-modal', 'ht-options')" class="w-full bg-blue-700 text-white py-4 rounded-full font-bold text-xs uppercase shadow-lg mb-2">Acceptar Selecció</button>
+            <button onclick="closeAndClear('ht-modal', 'ht-options')" class="w-full bg-slate-100 py-3 rounded-full font-bold text-xs uppercase text-slate-500">Tancar</button>
         </div>
     </div>
 
-    <div id="ritme-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-6 z-[115]">
+    <div id="ritme-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-6 z-[150]">
         <div class="bg-white rounded-3xl w-full max-w-sm p-6 text-center shadow-2xl">
             <h2 class="text-xs font-bold mb-6 uppercase">Ritme</h2>
             <div class="grid grid-cols-2 gap-2 mb-6">
@@ -171,17 +173,17 @@
         </div>
     </div>
 
-    <div id="stop-modal" class="hidden fixed inset-0 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-6 z-[150]">
+    <div id="stop-modal" class="hidden fixed inset-0 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-6 z-[250]">
         <div class="bg-white rounded-3xl w-full max-w-sm p-6 text-center shadow-2xl">
-            <h2 class="text-lg font-black uppercase mb-4">Aturar RCP?</h2>
+            <h2 class="text-lg font-black uppercase mb-4 text-red-600">Aturar RCP?</h2>
             <button onclick="saveAndReset()" class="w-full bg-red-600 text-white py-4 rounded-2xl font-bold uppercase shadow-lg mb-2">Guardar i Finalitzar</button>
             <button onclick="resumeCPR()" class="w-full bg-slate-100 py-4 rounded-2xl font-bold uppercase tracking-widest text-slate-600">TORNAR</button>
         </div>
     </div>
 
-    <div id="notes-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-6 z-[115]">
+    <div id="notes-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-6 z-[150]">
         <div class="bg-white rounded-3xl w-full max-w-sm p-6 shadow-2xl">
-            <h2 class="text-xs font-bold mb-4 uppercase">Nota</h2>
+            <h2 class="text-xs font-bold mb-4 uppercase">Nota de Registre</h2>
             <textarea id="note-input" rows="4" class="w-full border p-3 rounded-xl mb-4 text-sm outline-none focus:border-blue-400" placeholder="Escriu aquí..."></textarea>
             <div class="flex gap-2">
                 <button onclick="saveNote()" class="flex-1 bg-blue-700 text-white py-3 rounded-full font-bold text-xs uppercase shadow-md">Guardar</button>
@@ -190,7 +192,7 @@
         </div>
     </div>
 
-    <div id="history-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-6 z-[120]">
+    <div id="history-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-6 z-[150]">
         <div class="bg-white rounded-3xl w-full max-w-sm p-6 h-[80vh] flex flex-col shadow-2xl text-slate-800">
             <h2 class="text-xs font-bold mb-4 uppercase text-center tracking-widest text-slate-400">Historial</h2>
             <div id="history-list" class="flex-1 overflow-y-auto space-y-3 mb-4"></div>
@@ -205,6 +207,34 @@
         let audioCtx = null;
         let adrActive = false;
         let adrLimitSecs = 180, adrTimeLeft = 180;
+        let selectedBuffer = [];
+
+        // --- LÒGICA MULTI-SELECCIÓ ---
+        function toggleSelect(btn, action, qty) {
+            btn.classList.toggle('selected-item');
+            const index = selectedBuffer.findIndex(i => i.action === action && i.qty === qty);
+            if (index > -1) {
+                selectedBuffer.splice(index, 1);
+            } else {
+                selectedBuffer.push({ action, qty });
+            }
+        }
+
+        function confirmMultiple(modalId, containerId) {
+            if (selectedBuffer.length > 0) {
+                selectedBuffer.forEach(item => {
+                    logAction(item.action, item.qty);
+                });
+            }
+            closeAndClear(modalId, containerId);
+        }
+
+        function closeAndClear(modalId, containerId) {
+            selectedBuffer = [];
+            const buttons = document.querySelectorAll(`#${containerId} button`);
+            buttons.forEach(b => b.classList.remove('selected-item'));
+            toggleModal(modalId);
+        }
 
         // --- SWIPE LOGIC ---
         let startX = 0;
@@ -234,7 +264,7 @@
 
         function logAction(action, qty = '-', countType = null) {
             if(!active) startCPR();
-            const id = Date.now();
+            const id = Date.now() + Math.random(); // Evitar IDs duplicats en log ràpid
             const time = document.getElementById('t-total').innerText;
             if (countType && countType !== 'adr') updateCount(countType); 
             sessionLog.push({ id, time, action, qty, countType });
@@ -252,7 +282,7 @@
             adrTimeLeft = adrLimitSecs;
         }
 
-        function logSRI(med, dose) { logAction(med, dose); toggleModal('sri-modal'); }
+        function logRitme(r) { logAction('Ritme: ' + r); toggleModal('ritme-modal'); }
 
         function renderLog() {
             const logDiv = document.getElementById('event-log');
@@ -282,7 +312,7 @@
                     cycleSecs = 120; cycles++;
                     document.getElementById('cycle-count').innerText = cycles;
                     document.getElementById('count-cicles').innerText = cycles;
-                    logAction(`CICLE ${cycles} INICIAT`);
+                    logAction(`CICLE ${cycles} INICIAT`, '-');
                 }
                 if(adrActive && adrTimeLeft <= 0) {
                     showToast("ADRENALINA", "orange");
@@ -325,29 +355,37 @@
             osc.start(); osc.stop(audioCtx.currentTime + duration);
         }
 
-        // --- UTILS ---
         function toggleModal(id) { document.getElementById(id).classList.toggle('hidden'); if(id === 'history-modal') loadHistory(); }
-        function logIntub(device, size) { logAction(device, 'Mida: ' + size); toggleModal('intubacio-modal'); }
-        function logRitme(r) { logAction('Ritme: ' + r); toggleModal('ritme-modal'); }
-        function toggleHT(c) { 
-            const b = document.getElementById('btn-' + c); b.classList.toggle('cause-selected');
-            logAction('Causa: ' + c, b.classList.contains('cause-selected') ? 'SI' : 'NO');
-        }
         function toggleAdrLimit() { adrLimitSecs = (adrLimitSecs === 180) ? 120 : 180; document.getElementById('adr-limit-val').innerText = adrLimitSecs/60; adrTimeLeft = adrLimitSecs; updateUI(); }
         function confirmStop() { if(!active) return; clearInterval(timer); document.getElementById('stop-modal').classList.remove('hidden'); }
         function resumeCPR() { document.getElementById('stop-modal').classList.add('hidden'); active = false; startCPR(); }
-        function saveAndReset() { const session = { id: Date.now(), date: new Date().toLocaleString(), duration: document.getElementById('t-total').innerText, cycles: cycles, log: [...sessionLog], stats: {...counts} }; let history = JSON.parse(localStorage.getItem('rcp_history') || '[]'); history.push(session); localStorage.setItem('rcp_history', JSON.stringify(history)); location.reload(); }
+        function saveAndReset() { location.reload(); }
         function saveNote() { const val = document.getElementById('note-input').value; if(val) { logAction("NOTA: " + val); document.getElementById('note-input').value = ''; toggleModal('notes-modal'); } }
-        function loadHistory() { const h = JSON.parse(localStorage.getItem('rcp_history') || '[]'); const list = document.getElementById('history-list'); list.innerHTML = h.length ? h.map(s => `<div class="p-4 bg-slate-50 rounded-2xl border border-slate-200 text-[10px] shadow-sm mb-3"> <div class="flex justify-between items-start mb-2 uppercase"> <span class="font-black text-blue-700 leading-tight pr-4">${s.date}</span> <div class="flex gap-3 shrink-0"> <button onclick="editEntry(${s.id})" class="text-[14px] opacity-70">✏️</button> <button onclick="deleteEntry(${s.id})" class="text-[14px] opacity-70">🗑️</button> </div> </div> <div class="grid grid-cols-2 gap-1 font-bold text-slate-600 mb-2 border-t pt-2 border-slate-200/50"> <span>⏱️ Cicles: ${s.cycles}</span> <span>Durada: ${s.duration}</span> <span>⚡ Shock: ${s.stats.shock}</span> <span>💉 Adren: ${s.stats.adr}</span> </div> <details class="mt-2 text-slate-500 bg-white p-2 rounded-lg border"> <summary class="font-bold cursor-pointer uppercase text-[9px] text-blue-600">Detalls</summary> <div class="mt-2 space-y-1 max-h-40 overflow-y-auto font-mono"> ${s.log.map(l => `<p class="border-b pb-1"><strong>${l.time}</strong> - ${l.action} ${l.qty !== '-' ? '('+l.qty+')' : ''}</p>`).join('')} </div> </details> </div>`).reverse().join('') : "<p class='text-center opacity-40 py-8 text-xs font-bold uppercase'>Sense registres.</p>"; }
-        function deleteEntry(id) { if(confirm("Eliminar registre?")) { let h = JSON.parse(localStorage.getItem('rcp_history') || '[]'); h = h.filter(s => s.id !== id); localStorage.setItem('rcp_history', JSON.stringify(h)); loadHistory(); } }
-        function editEntry(id) { let h = JSON.parse(localStorage.getItem('rcp_history') || '[]'); const e = h.find(s => s.id === id); const n = prompt("Nom del registre:", e.date); if(n) { e.date = n; localStorage.setItem('rcp_history', JSON.stringify(h)); loadHistory(); } }
+        
+        function loadHistory() {
+            const h = JSON.parse(localStorage.getItem('rcp_history') || '[]');
+            const list = document.getElementById('history-list');
+            list.innerHTML = h.length ? h.map(s => `
+                <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200 text-[10px] shadow-sm mb-3">
+                    <div class="flex justify-between items-start mb-2 uppercase">
+                        <span class="font-black text-blue-700 leading-tight pr-4">${s.date}</span>
+                    </div>
+                    <div class="grid grid-cols-2 gap-1 font-bold text-slate-600 mb-2 border-t pt-2 border-slate-200/50">
+                        <span>⏱️ Cicles: ${s.cycles}</span>
+                        <span>Durada: ${s.duration}</span>
+                        <span>⚡ Shock: ${s.stats.shock}</span>
+                        <span>💉 Adren: ${s.stats.adr}</span>
+                    </div>
+                </div>`).reverse().join('') : "<p class='text-center opacity-40 py-8 text-xs font-bold uppercase'>Sense registres.</p>";
+        }
 
-        // Botons Tubs
+        // Tubs
         const tContainer = document.getElementById('tube-btns');
         [5.0, 5.5, 6.0, 6.5, 7.0, 7.5, 8.0, 8.5].forEach(m => {
             const b = document.createElement('button');
-            b.className = "bg-blue-600 text-white py-2 rounded-lg text-[10px] font-bold";
-            b.innerText = m; b.onclick = () => logIntub('Tubo ET', m);
+            b.className = "bg-slate-100 py-2 rounded-lg text-[10px] font-bold border border-transparent transition-colors";
+            b.innerText = m;
+            b.onclick = function() { toggleSelect(this, 'Tubo ET', m); };
             tContainer.appendChild(b);
         });
     </script>
