@@ -10,8 +10,15 @@
     <style>
         body { font-family: -apple-system, system-ui, sans-serif; touch-action: manipulation; -webkit-user-select: none; }
         .btn-press:active { transform: scale(0.95); filter: brightness(0.9); }
-        .log-entry { animation: slideIn 0.3s ease-out; }
+        .log-entry { animation: slideIn 0.3s ease-out; position: relative; overflow: hidden; background: white; }
         @keyframes slideIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        /* Estils per al Swipe */
+        .swipe-container { display: flex; transition: transform 0.3s ease; width: calc(100% + 80px); }
+        .swipe-content { width: calc(100% - 80px); display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 1rem; background: white; border-bottom: 1px solid #f1f5f9; }
+        .swipe-delete-btn { width: 80px; background: #ef4444; color: white; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; text-transform: uppercase; }
+        .swiped { transform: translateX(-80px); }
+
         .alert-flash { animation: flash 1s infinite; }
         @keyframes flash { 0%, 100% { background-color: #fee2e2; } 50% { background-color: #ef4444; color: white; } }
         .adr-flash { animation: flash-orange 1s infinite; }
@@ -60,10 +67,10 @@
     <div class="bg-slate-50 px-5 py-2 border-b flex justify-between text-[9px] font-bold text-slate-400 uppercase tracking-widest shrink-0">
         <span class="w-20">Temps</span>
         <span class="flex-1 px-2 text-center">Valoració / Acció</span>
-        <span class="w-16 text-right">Quant.</span>
+        <span class="w-16 text-right">Esborrar</span>
     </div>
 
-    <div id="event-log" class="flex-1 overflow-y-auto p-4 space-y-1 flex flex-col-reverse justify-end bg-white">
+    <div id="event-log" class="flex-1 overflow-y-auto bg-white">
         <div id="placeholder" class="text-center py-10 opacity-20 italic text-sm">Inicia l'acció per començar</div>
     </div>
 
@@ -80,8 +87,8 @@
     <div class="bg-white p-4 grid grid-cols-2 gap-2 pb-10 shadow-2xl shrink-0">
         <button onclick="toggleModal('ritme-modal')" class="bg-blue-700 text-white p-4 rounded-xl font-bold text-[11px] btn-press uppercase shadow-md">Ritmes</button>
         <button onclick="logAdrenalina()" class="bg-blue-700 text-white p-4 rounded-xl font-bold text-[11px] btn-press uppercase shadow-md">Adrenalina</button>
-        <button onclick="logAction('Descàrrega', '200J'); updateCount('shock')" class="bg-blue-700 text-white p-4 rounded-xl font-bold text-[11px] btn-press uppercase shadow-md">Descàrrega</button>
-        <button onclick="logAction('Amiodarona', '300 mg'); updateCount('amio')" class="bg-blue-700 text-white p-4 rounded-xl font-bold text-[11px] btn-press uppercase shadow-md">Amiodarona</button>
+        <button onclick="logAction('Descàrrega', '200J', 'shock')" class="bg-blue-700 text-white p-4 rounded-xl font-bold text-[11px] btn-press uppercase shadow-md">Descàrrega</button>
+        <button onclick="logAction('Amiodarona', '300 mg', 'amio')" class="bg-blue-700 text-white p-4 rounded-xl font-bold text-[11px] btn-press uppercase shadow-md">Amiodarona</button>
         <button onclick="toggleModal('intubacio-modal')" class="bg-blue-100 text-blue-800 p-4 rounded-xl font-bold text-[11px] btn-press uppercase">Vía Aèria</button>
         <button onclick="logAction('ECMO', 'Inici')" class="bg-blue-100 text-blue-800 p-4 rounded-xl font-bold text-[11px] btn-press uppercase">ECMO</button>
         <button onclick="toggleModal('ht-modal')" class="bg-slate-100 text-slate-700 p-4 rounded-xl font-bold text-[11px] btn-press uppercase border border-slate-200">H/T Causes</button>
@@ -94,14 +101,75 @@
         let counts = { shock:0, adr:0, amio:0 };
         let sessionLog = [];
         let audioCtx = null;
-
         let adrActive = false;
-        let adrLimitSecs = 180; 
-        let adrTimeLeft = 180;
+        let adrLimitSecs = 180, adrTimeLeft = 180;
 
+        // --- LÒGICA DE LOG I SWIPE ---
+        function logAction(action, qty = '-', type = null) {
+            if(!active) startCPR();
+            const id = Date.now();
+            const time = document.getElementById('t-total').innerText;
+            sessionLog.unshift({ id, time, action, qty, type }); // unshift per tenir l'últim a dalt
+            if(type) updateCount(type, 1);
+            renderLog();
+        }
+
+        function renderLog() {
+            const logDiv = document.getElementById('event-log');
+            if(sessionLog.length > 0 && document.getElementById('placeholder')) document.getElementById('placeholder').remove();
+            
+            logDiv.innerHTML = sessionLog.map(e => `
+                <div class="log-entry" id="entry-${e.id}">
+                    <div class="swipe-container" ontouchstart="handleTouchStart(event, ${e.id})" ontouchmove="handleTouchMove(event, ${e.id})" ontouchend="handleTouchEnd(event, ${e.id})">
+                        <div class="swipe-content">
+                            <span class="w-20 text-slate-400 font-mono text-[10px]">${e.time}</span>
+                            <span class="flex-1 px-2 uppercase text-center font-bold text-[11px] tracking-tight">${e.action}</span>
+                            <span class="w-16 text-right font-bold text-[11px]">${e.qty}</span>
+                        </div>
+                        <div class="swipe-delete-btn" onclick="deleteLogEntry(${e.id})">Esborrar</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // --- GESTIÓ DE TOUCH PER A SWIPE ---
+        let touchStartX = 0;
+        let currentEntryId = null;
+
+        function handleTouchStart(e, id) {
+            touchStartX = e.touches[0].clientX;
+            currentEntryId = id;
+        }
+
+        function handleTouchMove(e, id) {
+            const touchX = e.touches[0].clientX;
+            const diff = touchStartX - touchX;
+            const container = document.querySelector(`#entry-${id} .swipe-container`);
+            
+            if (diff > 20) { // Swipe esquerra
+                container.classList.add('swiped');
+            } else if (diff < -20) { // Swipe dreta (cancel·lar)
+                container.classList.remove('swiped');
+            }
+        }
+
+        function handleTouchEnd(e, id) {
+            // Es pot afegir lògica addicional si cal
+        }
+
+        function deleteLogEntry(id) {
+            const index = sessionLog.findIndex(e => e.id === id);
+            if (index !== -1) {
+                const entry = sessionLog[index];
+                if (entry.type) updateCount(entry.type, -1); // Resta del comptador si té tipus
+                sessionLog.splice(index, 1);
+                renderLog();
+            }
+        }
+
+        // --- LÒGICA CPR I ADRENALINA ---
         function logAdrenalina() {
-            logAction('Adrenalina', '1 mg');
-            updateCount('adr');
+            logAction('Adrenalina', '1 mg', 'adr');
             if (!adrActive) {
                 adrActive = true;
                 document.getElementById('adr-container').classList.remove('hidden');
@@ -110,11 +178,10 @@
             adrTimeLeft = adrLimitSecs;
         }
 
-        function toggleAdrLimit() {
-            adrLimitSecs = (adrLimitSecs === 180) ? 120 : 180;
-            document.getElementById('adr-limit-val').innerText = adrLimitSecs / 60;
-            adrTimeLeft = adrLimitSecs;
-            updateUI();
+        function updateCount(k, val) {
+            counts[k] += val;
+            if (counts[k] < 0) counts[k] = 0;
+            document.getElementById('count-'+k).innerText = counts[k];
         }
 
         function startCPR() {
@@ -122,8 +189,7 @@
             active = true;
             if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
             timer = setInterval(() => {
-                totalSecs++; 
-                cycleSecs--;
+                totalSecs++; cycleSecs--;
                 if(adrActive) adrTimeLeft--;
 
                 if(cycleSecs <= 0) {
@@ -131,7 +197,7 @@
                     cycleSecs = 120; cycles++;
                     document.getElementById('cycle-count').innerText = cycles;
                     document.getElementById('count-cicles').innerText = cycles;
-                    logAction(`CICLE ${cycles} INICIAT`, '-');
+                    logAction(`CICLE ${cycles} INICIAT`);
                 }
 
                 if(adrActive && adrTimeLeft <= 0) {
@@ -150,23 +216,16 @@
             
             const cb = document.getElementById('cycle-box');
             if(cycleSecs < 10) cb.classList.add('alert-flash'); else cb.classList.remove('alert-flash');
-
-            const ab = document.getElementById('adr-container');
-            if(adrActive && adrTimeLeft < 10) ab.classList.add('adr-flash'); else ab.classList.remove('adr-flash');
         }
 
+        // --- FUNCIONS AUXILIARS ---
         function showToast(msg, color) {
             const toast = document.getElementById('toast');
             document.getElementById('toast-msg').innerText = msg;
             toast.style.backgroundColor = (color === "red") ? "#ef4444" : "#f97316";
             toast.style.opacity = "1";
             setTimeout(() => toast.style.opacity = "0", 4000);
-            
-            // Alarma acústica: 3 beeps llargs i forts
-            if (audioCtx) {
-                const freq = (color === "red") ? 880 : 660; // Més agut per al ritme
-                playBeepSequence(freq);
-            }
+            if (audioCtx) playBeepSequence((color === "red") ? 880 : 660);
         }
 
         function playBeepSequence(freq) {
@@ -174,23 +233,23 @@
                 setTimeout(() => {
                     const osc = audioCtx.createOscillator();
                     const gain = audioCtx.createGain();
-                    osc.connect(gain);
-                    gain.connect(audioCtx.destination);
-                    osc.frequency.value = freq;
-                    osc.type = "square"; // So tipus alarma
+                    osc.connect(gain); gain.connect(audioCtx.destination);
+                    osc.frequency.value = freq; osc.type = "square";
                     gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
                     gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.8);
-                    osc.start();
-                    osc.stop(audioCtx.currentTime + 0.8);
+                    osc.start(); osc.stop(audioCtx.currentTime + 0.8);
                 }, i * 1000);
             }
         }
 
-        // Resta de funcions (modals, log, etc) es mantenen...
-        function toggleModal(id) { document.getElementById(id).classList.toggle('hidden'); if(id==='history-modal') loadHistory(); }
-        function logAction(action, qty = '-') { if(!active) startCPR(); const time = document.getElementById('t-total').innerText; sessionLog.push({ time, action, qty }); renderLog(); }
-        function updateCount(k) { counts[k]++; document.getElementById('count-'+k).innerText = counts[k]; }
-        function renderLog() { /* ... */ }
+        function toggleAdrLimit() {
+            adrLimitSecs = (adrLimitSecs === 180) ? 120 : 180;
+            document.getElementById('adr-limit-val').innerText = adrLimitSecs / 60;
+            adrTimeLeft = adrLimitSecs;
+            updateUI();
+        }
+
+        function toggleModal(id) { document.getElementById(id).classList.toggle('hidden'); }
         function confirmStop() { if(!active) return; clearInterval(timer); document.getElementById('stop-modal').classList.remove('hidden'); }
         function resumeCPR() { document.getElementById('stop-modal').classList.add('hidden'); active = false; startCPR(); }
         function saveAndReset() { location.reload(); }
