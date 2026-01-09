@@ -14,7 +14,7 @@
         @keyframes slideIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
         .alert-flash { animation: flash 1s infinite; }
         @keyframes flash { 0%, 100% { background-color: #fee2e2; } 50% { background-color: #ef4444; color: white; } }
-        .adr-alert { animation: flash-orange 1s infinite; }
+        .adr-flash { animation: flash-orange 1s infinite; }
         @keyframes flash-orange { 0%, 100% { background-color: #ffedd5; } 50% { background-color: #f97316; color: white; } }
         .cause-selected { background-color: #64748b !important; color: white !important; }
         #toast { transition: opacity 0.5s ease; pointer-events: none; }
@@ -31,26 +31,29 @@
     <header class="bg-white px-4 pt-12 pb-4 border-b flex justify-between items-center shadow-sm shrink-0">
         <div class="flex items-center gap-2 max-w-[70%]">
             <div class="bg-blue-600 p-1.5 rounded-lg text-white font-bold text-sm shrink-0">PCR</div>
-            <h1 class="text-base font-black tracking-tighter uppercase leading-none">Extrahospitalària</h1>
+            <h1 class="text-base font-black tracking-tighter uppercase leading-none text-slate-800">Extrahospitalària</h1>
         </div>
         <button onclick="confirmStop()" class="text-white font-bold text-[9px] bg-red-600 px-3 py-2 rounded-full shadow-sm uppercase shrink-0">Finalitzar</button>
     </header>
 
-    <div id="timer-box" class="bg-white grid grid-cols-4 border-b divide-x text-center shrink-0">
-        <div class="p-2">
-            <p class="text-[7px] font-bold text-slate-400 uppercase mb-1">Temps Total</p>
+    <div id="timer-box" class="bg-white grid grid-cols-3 border-b divide-x text-center shrink-0 transition-all duration-300">
+        <div class="p-3">
+            <p class="text-[8px] font-bold text-slate-400 uppercase mb-1">Temps Total</p>
             <span id="t-total" class="text-xl font-mono font-black tracking-tighter">00:00:00</span>
         </div>
-        <div id="adr-box" class="p-2 hidden bg-orange-50 transition-colors" onclick="toggleAdrInterval()">
-            <p class="text-[7px] font-bold text-orange-400 uppercase mb-1">Pròxima Adren (<span id="adr-interval-label">3</span>')</p>
+        
+        <div id="adr-timer-box" class="hidden p-3 bg-orange-50 transition-all cursor-pointer" onclick="toggleAdrInterval()">
+            <p class="text-[8px] font-bold text-orange-500 uppercase mb-1">Adren (<span id="adr-limit-label">3</span>')</p>
             <span id="t-adr" class="text-xl font-mono font-black text-orange-600 tracking-tighter">03:00</span>
         </div>
-        <div id="cycle-box" class="p-2">
-            <p class="text-[7px] font-bold text-slate-400 uppercase mb-1">Revisió en:</p>
+
+        <div id="cycle-box" class="p-3">
+            <p class="text-[8px] font-bold text-slate-400 uppercase mb-1">Ritme</p>
             <span id="t-cycle" class="text-xl font-mono font-black text-blue-600 tracking-tighter">02:00</span>
         </div>
-        <div class="p-2">
-            <p class="text-[7px] font-bold text-slate-400 uppercase mb-1">Cicles</p>
+        
+        <div class="p-3">
+            <p class="text-[8px] font-bold text-slate-400 uppercase mb-1">Cicles</p>
             <span id="cycle-count" class="text-xl font-mono font-black">1</span>
         </div>
     </div>
@@ -77,7 +80,7 @@
 
     <div class="bg-white p-4 grid grid-cols-2 gap-2 pb-10 shadow-2xl shrink-0">
         <button onclick="toggleModal('ritme-modal')" class="bg-blue-700 text-white p-4 rounded-xl font-bold text-[11px] btn-press uppercase shadow-md">Ritmes</button>
-        <button onclick="logAdren()" class="bg-blue-700 text-white p-4 rounded-xl font-bold text-[11px] btn-press uppercase shadow-md">Adrenalina</button>
+        <button onclick="logAdrenalina()" class="bg-blue-700 text-white p-4 rounded-xl font-bold text-[11px] btn-press uppercase shadow-md">Adrenalina</button>
         <button onclick="logAction('Descàrrega', '200J'); updateCount('shock')" class="bg-blue-700 text-white p-4 rounded-xl font-bold text-[11px] btn-press uppercase shadow-md">Descàrrega</button>
         <button onclick="logAction('Amiodarona', '300 mg'); updateCount('amio')" class="bg-blue-700 text-white p-4 rounded-xl font-bold text-[11px] btn-press uppercase shadow-md">Amiodarona</button>
         <button onclick="toggleModal('intubacio-modal')" class="bg-blue-100 text-blue-800 p-4 rounded-xl font-bold text-[11px] btn-press uppercase">Vía Aèria</button>
@@ -88,34 +91,38 @@
     </div>
 
     <script>
-        let totalSecs = 0, cycleSecs = 120, adrSecs = 180, adrInterval = 180, cycles = 1, timer, active = false;
+        let totalSecs = 0, cycleSecs = 120, cycles = 1, timer, active = false;
+        let adrSecs = 180, adrLimit = 180, adrActive = false;
         let counts = { shock:0, adr:0, amio:0 };
         let sessionLog = [];
         let audioCtx = null;
-        let adrActive = false;
 
-        function logAction(action, qty = '-') {
-            if(!active) startCPR();
-            const time = document.getElementById('t-total').innerText;
-            sessionLog.push({ time, action, qty });
-            renderLog();
-        }
-
-        function logAdren() {
+        function logAdrenalina() {
             logAction('Adrenalina', '1 mg');
             updateCount('adr');
-            if(!adrActive) {
+            
+            if (!adrActive) {
                 adrActive = true;
-                document.getElementById('adr-box').classList.remove('hidden');
-                document.getElementById('timer-box').classList.replace('grid-cols-3', 'grid-cols-4');
+                const timerBox = document.getElementById('timer-box');
+                const adrBox = document.getElementById('adr-timer-box');
+                timerBox.classList.replace('grid-cols-3', 'grid-cols-4');
+                adrBox.classList.remove('hidden');
             }
-            adrSecs = adrInterval; // Reinicia el comptador d'adrenalina al polsar el botó
+            // Reiniciar comptador al polsar adrenalina
+            adrSecs = adrLimit;
+            updateUI();
         }
 
         function toggleAdrInterval() {
-            adrInterval = (adrInterval === 180) ? 120 : 180;
-            document.getElementById('adr-interval-label').innerText = adrInterval / 60;
-            if(adrSecs > adrInterval) adrSecs = adrInterval;
+            if (adrLimit === 180) {
+                adrLimit = 120;
+                document.getElementById('adr-limit-label').innerText = "2";
+            } else {
+                adrLimit = 180;
+                document.getElementById('adr-limit-label').innerText = "3";
+            }
+            // Si el temps actual és major que el nou límit, l'ajustem
+            if (adrSecs > adrLimit) adrSecs = adrLimit;
             updateUI();
         }
 
@@ -123,22 +130,27 @@
             if(active) return;
             active = true;
             if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            
             timer = setInterval(() => {
                 totalSecs++; 
                 cycleSecs--;
-                if(adrActive) adrSecs--;
+                if (adrActive) adrSecs--;
 
+                // Gestió Cicle Ritme
                 if(cycleSecs <= 0) {
-                    showToast('REVISAR RITME', 'red');
+                    showToast("REVISAR RITME", "red");
                     cycleSecs = 120; cycles++;
                     document.getElementById('cycle-count').innerText = cycles;
                     document.getElementById('count-cicles').innerText = cycles;
+                    logAction(`CICLE ${cycles} INICIAT`, '-');
                 }
 
-                if(adrActive && adrSecs <= 0) {
-                    showToast('ADMINISTRAR ADRENALINA', 'orange');
-                    adrSecs = adrInterval;
+                // Gestió Adrenalina
+                if (adrActive && adrSecs <= 0) {
+                    showToast("ADMINISTRAR ADRENALINA", "orange");
+                    adrSecs = adrLimit; // Reinici automàtic del compte enrere
                 }
+
                 updateUI();
             }, 1000);
         }
@@ -147,50 +159,62 @@
             const pad = (n) => Math.abs(n).toString().padStart(2,'0');
             document.getElementById('t-total').innerText = `${pad(Math.floor(totalSecs/3600))}:${pad(Math.floor((totalSecs%3600)/60))}:${pad(totalSecs%60)}`;
             document.getElementById('t-cycle').innerText = `${pad(Math.floor(cycleSecs/60))}:${pad(cycleSecs%60)}`;
-            document.getElementById('t-adr').innerText = `${pad(Math.floor(adrSecs/60))}:${pad(adrSecs%60)}`;
             
-            // Estils alertes
-            const cb = document.getElementById('cycle-box');
-            if(cycleSecs < 10) cb.classList.add('alert-flash'); else cb.classList.remove('alert-flash');
-            
-            const ab = document.getElementById('adr-box');
-            if(adrActive && adrSecs < 10) ab.classList.add('adr-alert'); else ab.classList.remove('adr-alert');
+            if (adrActive) {
+                document.getElementById('t-adr').innerText = `${pad(Math.floor(adrSecs/60))}:${pad(adrSecs%60)}`;
+                const adrBox = document.getElementById('adr-timer-box');
+                if (adrSecs < 10) adrBox.classList.add('adr-flash');
+                else adrBox.classList.remove('adr-flash');
+            }
+
+            const cycleBox = document.getElementById('cycle-box');
+            if(cycleSecs < 10) cycleBox.classList.add('alert-flash');
+            else cycleBox.classList.remove('alert-flash');
         }
 
-        function showToast(msg, type) {
-            const t = document.getElementById('toast');
-            const tm = document.getElementById('toast-msg');
-            tm.innerText = msg;
-            t.className = type === 'red' ? 'fixed ... bg-red-600 ...' : 'fixed ... bg-orange-600 ...';
-            t.style.opacity = "1";
-            setTimeout(() => t.style.opacity = "0", 4000);
+        function showToast(msg, color) {
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toast-msg');
+            toastMsg.innerText = msg;
             
-            // Alarma forta i llarga
-            if(type === 'red') {
-                playAlarm(660, 0.8, 3); // Alarma revisió (3 beeps llargs)
+            if (color === "red") {
+                toast.classList.replace('bg-orange-600', 'bg-red-600');
+                playAlarm(880, 1.0, 2); // Alarma ritme (Més forta)
             } else {
-                playAlarm(880, 0.4, 4); // Alarma Adren (4 beeps aguts)
+                toast.classList.add('bg-orange-600');
+                playAlarm(660, 0.6, 3); // Alarma adrenalina
             }
+
+            toast.style.opacity = "1";
+            setTimeout(() => toast.style.opacity = "0", 4000);
         }
 
         function playAlarm(freq, duration, repeats) {
-            for(let i=0; i<repeats; i++) {
+            if (!audioCtx) return;
+            for (let i = 0; i < repeats; i++) {
                 setTimeout(() => {
                     const osc = audioCtx.createOscillator();
                     const gain = audioCtx.createGain();
-                    osc.connect(gain); gain.connect(audioCtx.destination);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
                     osc.frequency.value = freq;
-                    osc.type = "square";
+                    osc.type = "square"; // Tò més fort i audibles
                     gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
                     gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
-                    osc.start(); osc.stop(audioCtx.currentTime + duration);
-                }, i * 600);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + duration);
+                }, i * (duration * 1200));
             }
         }
-        
-        // La resta de funcions (modals, renderLog, intubació) es mantenen igual que la versió anterior...
-        function toggleModal(id) { document.getElementById(id).classList.toggle('hidden'); if(id === 'history-modal') loadHistory(); }
-        function logIntub(device, size) { logAction(device, 'Mida: ' + size); toggleModal('intubacio-modal'); }
+
+        // Resta de funcions necessàries per al funcionament
+        function toggleModal(id) { document.getElementById(id).classList.toggle('hidden'); if(id==='history-modal') loadHistory(); }
+        function logAction(action, qty = '-') {
+            if(!active) startCPR();
+            const time = document.getElementById('t-total').innerText;
+            sessionLog.push({ time, action, qty });
+            renderLog();
+        }
         function renderLog() {
             const logDiv = document.getElementById('event-log');
             if(document.getElementById('placeholder')) document.getElementById('placeholder').remove();
@@ -201,15 +225,11 @@
                     <span class="w-16 text-right">${e.qty}</span>
                 </div>`).reverse().join('');
         }
-        function toggleHT(c) { 
-            const b = document.getElementById('btn-' + c); b.classList.toggle('cause-selected');
-            logAction('Causa: ' + c, b.classList.contains('cause-selected') ? 'SI' : 'NO');
-        }
         function updateCount(k) { counts[k]++; document.getElementById('count-'+k).innerText = counts[k]; }
-        function logRitme(r) { logAction('Ritme: ' + r); toggleModal('ritme-modal'); }
         function confirmStop() { if(!active) return; clearInterval(timer); document.getElementById('stop-modal').classList.remove('hidden'); }
         function resumeCPR() { document.getElementById('stop-modal').classList.add('hidden'); active = false; startCPR(); }
-        function saveAndReset() { location.reload(); } // Implementació simple de reset
+        function saveAndReset() { location.reload(); }
     </script>
-</body>
+
+    </body>
 </html>
