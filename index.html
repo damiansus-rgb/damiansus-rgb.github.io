@@ -94,10 +94,12 @@
             <h2 class="text-xs font-bold text-slate-800 mb-6 text-center uppercase">Fàrmacs SRI (Adult)</h2>
             <div class="grid grid-cols-1 gap-2 mb-6" id="sri-options">
                 <button onclick="toggleSelect(this, 'Rocuroni', '1.2 mg/kg')" class="bg-slate-50 py-3 rounded-xl text-[11px] font-bold flex justify-between px-4 border border-transparent"><span>Rocuroni</span> <span>1.2 mg/kg</span></button>
+                <button onclick="toggleSelect(this, 'Succinilcolina', '1.5 mg/kg')" class="bg-slate-50 py-3 rounded-xl text-[11px] font-bold flex justify-between px-4 border border-transparent"><span>Succinilcolina</span> <span>1.5 mg/kg</span></button>
                 <button onclick="toggleSelect(this, 'Propofol', '2 mg/kg')" class="bg-slate-50 py-3 rounded-xl text-[11px] font-bold flex justify-between px-4 border border-transparent"><span>Propofol</span> <span>2 mg/kg</span></button>
                 <button onclick="toggleSelect(this, 'Ketamina', '2 mg/kg')" class="bg-slate-50 py-3 rounded-xl text-[11px] font-bold flex justify-between px-4 border border-transparent"><span>Ketamina</span> <span>2 mg/kg</span></button>
                 <button onclick="toggleSelect(this, 'Etomidat', '0.3 mg/kg')" class="bg-slate-50 py-3 rounded-xl text-[11px] font-bold flex justify-between px-4 border border-transparent"><span>Etomidat</span> <span>0.3 mg/kg</span></button>
                 <button onclick="toggleSelect(this, 'Midazolam', '0.3 mg/kg')" class="bg-slate-50 py-3 rounded-xl text-[11px] font-bold flex justify-between px-4 border border-transparent"><span>Midazolam</span> <span>0.3 mg/kg</span></button>
+                <button onclick="toggleSelect(this, 'Fentanil', '3-5 µg/kg')" class="bg-slate-50 py-3 rounded-xl text-[11px] font-bold flex justify-between px-4 border border-transparent"><span>Fentanil</span> <span>3-5 µg/kg</span></button>
             </div>
             <button onclick="confirmMultiple('sri-modal', 'sri-options')" class="w-full bg-blue-700 text-white py-4 rounded-full font-bold text-xs uppercase shadow-lg mb-2">Acceptar Selecció</button>
             <button onclick="closeAndClear('sri-modal', 'sri-options')" class="w-full bg-slate-100 py-3 rounded-full font-bold text-xs uppercase text-slate-500">Tancar</button>
@@ -291,8 +293,7 @@
         function logRitme(r) { logAction('Ritme: ' + r); toggleModal('ritme-modal'); }
         function confirmStop() { if(active) document.getElementById('stop-modal').classList.remove('hidden'); }
 
-        // --- FUNCIONS DE GUARDAT I HISTORIAL ---
-
+        // HISTORIAL
         function saveAndReset() {
             const session = {
                 id: Date.now(),
@@ -362,7 +363,7 @@
 
         function saveNote() { const val = document.getElementById('note-input').value; if(val) { logAction("NOTA", val); document.getElementById('note-input').value = ''; toggleModal('notes-modal'); } }
 
-        // Tubs dinàmics
+        // Tubs ET
         const tContainer = document.getElementById('tube-btns');
         [5.0, 5.5, 6.0, 6.5, 7.0, 7.5, 8.0, 8.5].forEach(m => {
             const b = document.createElement('button');
