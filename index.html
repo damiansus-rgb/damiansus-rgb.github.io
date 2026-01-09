@@ -66,7 +66,7 @@
     <div class="bg-slate-50 px-5 py-2 border-b flex justify-between text-[9px] font-bold text-slate-400 uppercase tracking-widest shrink-0">
         <span class="w-20">Temps</span>
         <span class="flex-1 px-2 text-center">Valoració / Acció</span>
-        <span class="w-16 text-right">Quant.</span>
+        <span class="w-16 text-right">Esborrar</span>
     </div>
 
     <div id="event-log" class="flex-1 overflow-y-auto bg-white">
@@ -89,17 +89,33 @@
         <button onclick="logAction('Descàrrega', '200J', 'shock')" class="bg-blue-700 text-white p-4 rounded-xl font-bold text-[11px] btn-press uppercase shadow-md">Descàrrega</button>
         <button onclick="logAction('Amiodarona', '300 mg', 'amio')" class="bg-blue-700 text-white p-4 rounded-xl font-bold text-[11px] btn-press uppercase shadow-md">Amiodarona</button>
         <button onclick="toggleModal('intubacio-modal')" class="bg-blue-100 text-blue-800 p-4 rounded-xl font-bold text-[11px] btn-press uppercase">Vía Aèria</button>
-        <button onclick="logAction('ECMO', 'Inici')" class="bg-blue-100 text-blue-800 p-4 rounded-xl font-bold text-[11px] btn-press uppercase">ECMO</button>
+        <button onclick="toggleModal('sri-modal')" class="bg-blue-100 text-blue-800 p-4 rounded-xl font-bold text-[11px] btn-press uppercase">SRI (Fàrmacs)</button>
         <button onclick="toggleModal('ht-modal')" class="bg-slate-100 text-slate-700 p-4 rounded-xl font-bold text-[11px] btn-press uppercase border border-slate-200">H/T Causes</button>
         <button onclick="toggleModal('notes-modal')" class="bg-slate-100 text-slate-700 p-4 rounded-xl font-bold text-[11px] btn-press uppercase border border-slate-200">Notes</button>
         <button onclick="toggleModal('history-modal')" class="bg-slate-800 text-white p-4 rounded-xl font-bold text-[11px] btn-press uppercase col-span-2 text-center shadow-lg">Consultar Historial</button>
     </div>
 
-    <div id="history-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-6 z-[120]">
-        <div class="bg-white rounded-3xl w-full max-w-sm p-6 h-[80vh] flex flex-col shadow-2xl">
-            <h2 class="text-xs font-bold mb-4 uppercase text-center tracking-widest text-slate-400">Historial de Registres</h2>
-            <div id="history-list" class="flex-1 overflow-y-auto space-y-3 mb-4"></div>
-            <button onclick="toggleModal('history-modal')" class="w-full bg-blue-700 text-white py-3 rounded-full font-bold text-xs uppercase shadow-md">Tancar</button>
+    <div id="sri-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-6 z-[115]">
+        <div class="bg-white rounded-3xl w-full max-w-sm p-6 shadow-2xl">
+            <h2 class="text-xs font-bold text-slate-800 mb-6 text-center uppercase tracking-widest">Fàrmacs SRI (Adult)</h2>
+            <div class="grid grid-cols-1 gap-2">
+                <button onclick="logSRI('Rocuroni', '1.2 mg/kg')" class="bg-slate-800 text-white py-3 rounded-xl text-[11px] font-bold btn-press flex justify-between px-4">
+                    <span>Rocuroni</span> <span>1.2 mg/kg</span>
+                </button>
+                <button onclick="logSRI('Propofol', '2 mg/kg')" class="bg-slate-800 text-white py-3 rounded-xl text-[11px] font-bold btn-press flex justify-between px-4">
+                    <span>Propofol</span> <span>2 mg/kg</span>
+                </button>
+                <button onclick="logSRI('Ketamina', '2 mg/kg')" class="bg-slate-800 text-white py-3 rounded-xl text-[11px] font-bold btn-press flex justify-between px-4">
+                    <span>Ketamina</span> <span>2 mg/kg</span>
+                </button>
+                <button onclick="logSRI('Midazolam', '0.3 mg/kg')" class="bg-slate-800 text-white py-3 rounded-xl text-[11px] font-bold btn-press flex justify-between px-4">
+                    <span>Midazolam</span> <span>0.3 mg/kg</span>
+                </button>
+                <button onclick="logSRI('Etomidat', '0.3 mg/kg')" class="bg-slate-800 text-white py-3 rounded-xl text-[11px] font-bold btn-press flex justify-between px-4">
+                    <span>Etomidat</span> <span>0.3 mg/kg</span>
+                </button>
+            </div>
+            <button onclick="toggleModal('sri-modal')" class="w-full mt-6 bg-slate-100 py-3 rounded-full font-bold text-xs uppercase text-slate-500">Tancar</button>
         </div>
     </div>
 
@@ -143,7 +159,7 @@
 
     <div id="ritme-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-6 z-[115]">
         <div class="bg-white rounded-3xl w-full max-w-sm p-6 text-center shadow-2xl">
-            <h2 class="text-xs font-bold mb-6 uppercase">Tipus de Ritme</h2>
+            <h2 class="text-xs font-bold mb-6 uppercase">Ritme</h2>
             <div class="grid grid-cols-2 gap-2 mb-6">
                 <button onclick="logRitme('AESP')" class="bg-slate-500 text-white py-3 rounded-full text-[11px] font-bold btn-press">AESP</button>
                 <button onclick="logRitme('Asistòlia')" class="bg-slate-500 text-white py-3 rounded-full text-[11px] font-bold btn-press">Asistòlia</button>
@@ -165,12 +181,20 @@
 
     <div id="notes-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-6 z-[115]">
         <div class="bg-white rounded-3xl w-full max-w-sm p-6 shadow-2xl">
-            <h2 class="text-xs font-bold mb-4 uppercase">Nota de Registre</h2>
+            <h2 class="text-xs font-bold mb-4 uppercase">Nota</h2>
             <textarea id="note-input" rows="4" class="w-full border p-3 rounded-xl mb-4 text-sm outline-none focus:border-blue-400" placeholder="Escriu aquí..."></textarea>
             <div class="flex gap-2">
                 <button onclick="saveNote()" class="flex-1 bg-blue-700 text-white py-3 rounded-full font-bold text-xs uppercase shadow-md">Guardar</button>
                 <button onclick="toggleModal('notes-modal')" class="flex-1 bg-slate-100 py-3 rounded-full font-bold text-xs uppercase text-slate-500">Tancar</button>
             </div>
+        </div>
+    </div>
+
+    <div id="history-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-6 z-[120]">
+        <div class="bg-white rounded-3xl w-full max-w-sm p-6 h-[80vh] flex flex-col shadow-2xl text-slate-800">
+            <h2 class="text-xs font-bold mb-4 uppercase text-center tracking-widest text-slate-400">Historial</h2>
+            <div id="history-list" class="flex-1 overflow-y-auto space-y-3 mb-4"></div>
+            <button onclick="toggleModal('history-modal')" class="w-full bg-blue-700 text-white py-3 rounded-full font-bold text-xs uppercase shadow-md">Tancar</button>
         </div>
     </div>
 
@@ -182,13 +206,9 @@
         let adrActive = false;
         let adrLimitSecs = 180, adrTimeLeft = 180;
 
-        // Swipe logic
+        // --- SWIPE LOGIC ---
         let startX = 0;
-
-        function handleTouchStart(e) {
-            startX = e.touches[0].clientX;
-        }
-
+        function handleTouchStart(e) { startX = e.touches[0].clientX; }
         function handleTouchMove(e, id) {
             let moveX = e.touches[0].clientX;
             let diff = startX - moveX;
@@ -210,28 +230,20 @@
             }
         }
 
-        function updateCount(k) { 
-            counts[k]++; 
-            document.getElementById('count-'+k).innerText = counts[k]; 
-        }
+        function updateCount(k) { counts[k]++; document.getElementById('count-'+k).innerText = counts[k]; }
 
         function logAction(action, qty = '-', countType = null) {
             if(!active) startCPR();
             const id = Date.now();
             const time = document.getElementById('t-total').innerText;
-            
-            // Si el registro tiene un tipo de contador (amio o shock), lo incrementamos
-            if (countType) {
-                updateCount(countType);
-            }
-
+            if (countType && countType !== 'adr') updateCount(countType); 
             sessionLog.push({ id, time, action, qty, countType });
             renderLog();
         }
 
         function logAdrenalina() {
-            // Llama a logAction pero con el flag de adrenalina
             logAction('Adrenalina', '1 mg', 'adr');
+            updateCount('adr');
             if (!adrActive) {
                 adrActive = true;
                 document.getElementById('adr-container').classList.remove('hidden');
@@ -240,10 +252,11 @@
             adrTimeLeft = adrLimitSecs;
         }
 
+        function logSRI(med, dose) { logAction(med, dose); toggleModal('sri-modal'); }
+
         function renderLog() {
             const logDiv = document.getElementById('event-log');
             if(sessionLog.length > 0 && document.getElementById('placeholder')) document.getElementById('placeholder').remove();
-            
             logDiv.innerHTML = sessionLog.map(e => `
                 <div class="log-entry" ontouchstart="handleTouchStart(event)" ontouchmove="handleTouchMove(event, ${e.id})">
                     <div class="swipe-container" id="swipe-${e.id}">
@@ -257,41 +270,20 @@
                 </div>`).reverse().join('');
         }
 
-        function toggleAdrLimit() {
-            adrLimitSecs = (adrLimitSecs === 180) ? 120 : 180;
-            document.getElementById('adr-limit-val').innerText = adrLimitSecs / 60;
-            adrTimeLeft = adrLimitSecs;
-            updateUI();
-        }
-
-        const tContainer = document.getElementById('tube-btns');
-        [5.0, 5.5, 6.0, 6.5, 7.0, 7.5, 8.0, 8.5].forEach(m => {
-            const b = document.createElement('button');
-            b.className = "bg-blue-600 text-white py-2 rounded-lg text-[10px] font-bold";
-            b.innerText = m;
-            b.onclick = () => logIntub('Tubo ET', m);
-            tContainer.appendChild(b);
-        });
-
-        function logIntub(device, size) { logAction(device, 'Mida: ' + size); toggleModal('intubacio-modal'); }
-
+        // --- TIMER LOGIC ---
         function startCPR() {
-            if(active) return;
-            active = true;
+            if(active) return; active = true;
             if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
             timer = setInterval(() => {
-                totalSecs++; 
-                cycleSecs--;
+                totalSecs++; cycleSecs--;
                 if(adrActive) adrTimeLeft--;
-
                 if(cycleSecs <= 0) {
                     showToast("REVISAR RITME", "red");
                     cycleSecs = 120; cycles++;
                     document.getElementById('cycle-count').innerText = cycles;
                     document.getElementById('count-cicles').innerText = cycles;
-                    logAction(`CICLE ${cycles} INICIAT`, '-');
+                    logAction(`CICLE ${cycles} INICIAT`);
                 }
-
                 if(adrActive && adrTimeLeft <= 0) {
                     showToast("ADRENALINA", "orange");
                     adrTimeLeft = adrLimitSecs;
@@ -313,8 +305,7 @@
 
         function showToast(msg, type) {
             const toast = document.getElementById('toast');
-            const toastMsg = toast.querySelector('p:last-child');
-            toastMsg.innerText = msg;
+            document.getElementById('toast-msg').innerText = msg;
             toast.style.backgroundColor = (type === "red") ? "#ef4444" : "#f97316";
             toast.style.opacity = "1";
             setTimeout(() => toast.style.opacity = "0", 3500);
@@ -327,62 +318,38 @@
         function playBeep(freq, duration) {
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-            osc.frequency.value = freq;
-            osc.type = "square";
+            osc.connect(gain); gain.connect(audioCtx.destination);
+            osc.frequency.value = freq; osc.type = "square";
             gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
             gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
-            osc.start();
-            osc.stop(audioCtx.currentTime + duration);
+            osc.start(); osc.stop(audioCtx.currentTime + duration);
         }
 
+        // --- UTILS ---
         function toggleModal(id) { document.getElementById(id).classList.toggle('hidden'); if(id === 'history-modal') loadHistory(); }
+        function logIntub(device, size) { logAction(device, 'Mida: ' + size); toggleModal('intubacio-modal'); }
         function logRitme(r) { logAction('Ritme: ' + r); toggleModal('ritme-modal'); }
         function toggleHT(c) { 
-            const b = document.getElementById('btn-' + c);
-            b.classList.toggle('cause-selected');
+            const b = document.getElementById('btn-' + c); b.classList.toggle('cause-selected');
             logAction('Causa: ' + c, b.classList.contains('cause-selected') ? 'SI' : 'NO');
         }
+        function toggleAdrLimit() { adrLimitSecs = (adrLimitSecs === 180) ? 120 : 180; document.getElementById('adr-limit-val').innerText = adrLimitSecs/60; adrTimeLeft = adrLimitSecs; updateUI(); }
         function confirmStop() { if(!active) return; clearInterval(timer); document.getElementById('stop-modal').classList.remove('hidden'); }
         function resumeCPR() { document.getElementById('stop-modal').classList.add('hidden'); active = false; startCPR(); }
+        function saveAndReset() { const session = { id: Date.now(), date: new Date().toLocaleString(), duration: document.getElementById('t-total').innerText, cycles: cycles, log: [...sessionLog], stats: {...counts} }; let history = JSON.parse(localStorage.getItem('rcp_history') || '[]'); history.push(session); localStorage.setItem('rcp_history', JSON.stringify(history)); location.reload(); }
+        function saveNote() { const val = document.getElementById('note-input').value; if(val) { logAction("NOTA: " + val); document.getElementById('note-input').value = ''; toggleModal('notes-modal'); } }
+        function loadHistory() { const h = JSON.parse(localStorage.getItem('rcp_history') || '[]'); const list = document.getElementById('history-list'); list.innerHTML = h.length ? h.map(s => `<div class="p-4 bg-slate-50 rounded-2xl border border-slate-200 text-[10px] shadow-sm mb-3"> <div class="flex justify-between items-start mb-2 uppercase"> <span class="font-black text-blue-700 leading-tight pr-4">${s.date}</span> <div class="flex gap-3 shrink-0"> <button onclick="editEntry(${s.id})" class="text-[14px] opacity-70">✏️</button> <button onclick="deleteEntry(${s.id})" class="text-[14px] opacity-70">🗑️</button> </div> </div> <div class="grid grid-cols-2 gap-1 font-bold text-slate-600 mb-2 border-t pt-2 border-slate-200/50"> <span>⏱️ Cicles: ${s.cycles}</span> <span>Durada: ${s.duration}</span> <span>⚡ Shock: ${s.stats.shock}</span> <span>💉 Adren: ${s.stats.adr}</span> </div> <details class="mt-2 text-slate-500 bg-white p-2 rounded-lg border"> <summary class="font-bold cursor-pointer uppercase text-[9px] text-blue-600">Detalls</summary> <div class="mt-2 space-y-1 max-h-40 overflow-y-auto font-mono"> ${s.log.map(l => `<p class="border-b pb-1"><strong>${l.time}</strong> - ${l.action} ${l.qty !== '-' ? '('+l.qty+')' : ''}</p>`).join('')} </div> </details> </div>`).reverse().join('') : "<p class='text-center opacity-40 py-8 text-xs font-bold uppercase'>Sense registres.</p>"; }
+        function deleteEntry(id) { if(confirm("Eliminar registre?")) { let h = JSON.parse(localStorage.getItem('rcp_history') || '[]'); h = h.filter(s => s.id !== id); localStorage.setItem('rcp_history', JSON.stringify(h)); loadHistory(); } }
+        function editEntry(id) { let h = JSON.parse(localStorage.getItem('rcp_history') || '[]'); const e = h.find(s => s.id === id); const n = prompt("Nom del registre:", e.date); if(n) { e.date = n; localStorage.setItem('rcp_history', JSON.stringify(h)); loadHistory(); } }
 
-        function saveAndReset() {
-            const session = {
-                id: Date.now(),
-                date: new Date().toLocaleString(),
-                duration: document.getElementById('t-total').innerText,
-                cycles: cycles,
-                log: [...sessionLog],
-                stats: {...counts}
-            };
-            let history = JSON.parse(localStorage.getItem('rcp_history') || '[]');
-            history.push(session);
-            localStorage.setItem('rcp_history', JSON.stringify(history));
-            location.reload(); 
-        }
-
-        function saveNote() {
-            const val = document.getElementById('note-input').value;
-            if(val) { logAction("NOTA: " + val); document.getElementById('note-input').value = ''; toggleModal('notes-modal'); }
-        }
-
-        function loadHistory() {
-            const history = JSON.parse(localStorage.getItem('rcp_history') || '[]');
-            const list = document.getElementById('history-list');
-            list.innerHTML = history.length ? history.map(s => `
-                <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200 text-[10px] shadow-sm mb-3">
-                    <div class="flex justify-between items-start mb-2 uppercase">
-                        <span class="font-black text-blue-700 leading-tight pr-4">${s.date}</span>
-                    </div>
-                    <div class="grid grid-cols-2 gap-1 font-bold text-slate-600 mb-2 border-t pt-2 border-slate-200/50">
-                        <span>⏱️ Cicles: ${s.cycles}</span>
-                        <span>Durada: ${s.duration}</span>
-                        <span>⚡ Shock: ${s.stats.shock}</span>
-                        <span>💉 Adren: ${s.stats.adr}</span>
-                    </div>
-                </div>`).reverse().join('') : "<p class='text-center opacity-40 py-8 text-xs font-bold uppercase'>Sense registres.</p>";
-        }
+        // Botons Tubs
+        const tContainer = document.getElementById('tube-btns');
+        [5.0, 5.5, 6.0, 6.5, 7.0, 7.5, 8.0, 8.5].forEach(m => {
+            const b = document.createElement('button');
+            b.className = "bg-blue-600 text-white py-2 rounded-lg text-[10px] font-bold";
+            b.innerText = m; b.onclick = () => logIntub('Tubo ET', m);
+            tContainer.appendChild(b);
+        });
     </script>
 </body>
 </html>
