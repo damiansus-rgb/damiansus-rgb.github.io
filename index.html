@@ -105,7 +105,7 @@
                 <button onclick="logRitme('FV')" class="bg-blue-600 text-white py-3 rounded-xl font-bold text-[11px]">FV</button>
                 <button onclick="logRitme('TVsp')" class="bg-blue-600 text-white py-3 rounded-xl font-bold text-[11px]">TVsp</button>
             </div>
-            <button onclick="logRitme('RECUPERA RITMO')" class="w-full bg-green-600 text-white py-3 rounded-xl font-bold text-[11px] mb-4 uppercase">RECUPERA RITMO</button>
+            <button onclick="logRitme('RECUPERA RITME')" class="w-full bg-green-600 text-white py-3 rounded-xl font-bold text-[11px] mb-4 uppercase">RECUPERA RITME</button>
             <button onclick="toggleModal('ritme-modal')" class="text-slate-400 font-bold text-[10px] uppercase">Tancar</button>
         </div>
     </div>
@@ -331,7 +331,6 @@
         
         function logRitme(r) { 
             logAction('Ritme: ' + r); 
-            // Si recupera ritmo, se suele parar el crono de ciclos, pero lo mantengo por seguridad técnica
             toggleModal('ritme-modal'); 
         }
 
