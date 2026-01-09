@@ -10,14 +10,13 @@
     <style>
         body { font-family: -apple-system, system-ui, sans-serif; touch-action: manipulation; -webkit-user-select: none; }
         .btn-press:active { transform: scale(0.95); filter: brightness(0.9); }
-        
-        /* Log Entry amb Swipe */
-        .log-entry { position: relative; overflow: hidden; background: white; animation: slideIn 0.3s ease-out; border-bottom: 1px solid #f1f5f9; }
+        .log-entry { animation: slideIn 0.3s ease-out; position: relative; overflow: hidden; }
         @keyframes slideIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
         
-        .swipe-container { display: flex; width: calc(100% + 80px); transition: transform 0.3s ease-out; }
-        .swipe-content { width: calc(100% - 80px); padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; background: white; }
-        .swipe-delete { width: 80px; background: #ef4444; color: white; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; text-transform: uppercase; cursor: pointer; }
+        /* Estils per al Swipe */
+        .swipe-container { display: flex; transition: transform 0.3s ease; width: calc(100% + 80px); }
+        .swipe-content { width: calc(100% - 80px); display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 1.25rem; background: white; border-bottom: 1px solid #f1f5f9; }
+        .delete-btn { width: 80px; background: #ef4444; color: white; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; text-transform: uppercase; }
         .swiped { transform: translateX(-80px); }
 
         .alert-flash { animation: flash 1s infinite; }
@@ -68,7 +67,7 @@
     <div class="bg-slate-50 px-5 py-2 border-b flex justify-between text-[9px] font-bold text-slate-400 uppercase tracking-widest shrink-0">
         <span class="w-20">Temps</span>
         <span class="flex-1 px-2 text-center">Valoració / Acció</span>
-        <span class="w-16 text-right">Gliss. esb.</span>
+        <span class="w-16 text-right">Quant.</span>
     </div>
 
     <div id="event-log" class="flex-1 overflow-y-auto bg-white">
@@ -97,74 +96,134 @@
         <button onclick="toggleModal('history-modal')" class="bg-slate-800 text-white p-4 rounded-xl font-bold text-[11px] btn-press uppercase col-span-2 text-center shadow-lg">Consultar Historial</button>
     </div>
 
+    <div id="history-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-6 z-[120]">
+        <div class="bg-white rounded-3xl w-full max-w-sm p-6 h-[80vh] flex flex-col shadow-2xl">
+            <h2 class="text-xs font-bold mb-4 uppercase text-center tracking-widest text-slate-400">Historial de Registres</h2>
+            <div id="history-list" class="flex-1 overflow-y-auto space-y-3 mb-4"></div>
+            <button onclick="toggleModal('history-modal')" class="w-full bg-blue-700 text-white py-3 rounded-full font-bold text-xs uppercase shadow-md">Tancar</button>
+        </div>
+    </div>
+
+    <div id="intubacio-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-6 z-[115]">
+        <div class="bg-white rounded-3xl w-full max-w-sm p-6 shadow-2xl">
+            <h2 class="text-xs font-bold text-slate-800 mb-6 text-center uppercase">Dispositiu Vía Aèria</h2>
+            <div class="space-y-4 text-center">
+                <div>
+                    <p class="text-[10px] font-bold text-slate-400 uppercase mb-2">TUBO ET (Mida)</p>
+                    <div class="grid grid-cols-4 gap-2" id="tube-btns"></div>
+                </div>
+                <div>
+                    <p class="text-[10px] font-bold text-slate-400 uppercase mb-2">IGEL (Mida)</p>
+                    <div class="grid grid-cols-3 gap-2">
+                        <button onclick="logIntub('IGEL', '3')" class="bg-indigo-600 text-white py-3 rounded-lg text-[11px] font-bold btn-press">3</button>
+                        <button onclick="logIntub('IGEL', '4')" class="bg-indigo-600 text-white py-3 rounded-lg text-[11px] font-bold btn-press">4</button>
+                        <button onclick="logIntub('IGEL', '5')" class="bg-indigo-600 text-white py-3 rounded-lg text-[11px] font-bold btn-press">5</button>
+                    </div>
+                </div>
+            </div>
+            <button onclick="toggleModal('intubacio-modal')" class="w-full mt-6 bg-slate-100 py-3 rounded-full font-bold text-xs uppercase text-slate-500">Cancel·la</button>
+        </div>
+    </div>
+
+    <div id="ht-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-6 z-[115]">
+        <div class="bg-white rounded-3xl w-full max-w-sm p-6 shadow-2xl overflow-y-auto max-h-[90vh]">
+            <h2 class="text-xs font-bold text-slate-800 mb-6 text-center uppercase tracking-tight">Causa Reversible</h2>
+            <div class="grid grid-cols-2 gap-2 mb-6 text-center">
+                <button id="btn-Hipovolèmia" onclick="toggleHT('Hipovolèmia')" class="bg-blue-900 text-white py-3 rounded-full text-[10px] font-bold btn-press">Hipovolèmia</button>
+                <button id="btn-Hipotèrmia" onclick="toggleHT('Hipotèrmia')" class="bg-blue-900 text-white py-3 rounded-full text-[10px] font-bold btn-press">Hipotèrmia</button>
+                <button id="btn-Hipòxia" onclick="toggleHT('Hipòxia')" class="bg-blue-900 text-white py-3 rounded-full text-[10px] font-bold btn-press">Hipòxia</button>
+                <button id="btn-Hidroelectròlits" onclick="toggleHT('Hidroelectròlits')" class="bg-blue-900 text-white py-3 rounded-full text-[10px] font-bold btn-press">Hidroelectròlits</button>
+                <button id="btn-Pneumotòrax" onclick="toggleHT('Pneumotòrax')" class="bg-blue-900 text-white py-3 rounded-full text-[10px] font-bold btn-press leading-tight">Pneumotòrax Tensió</button>
+                <button id="btn-Taponament" onclick="toggleHT('Taponament')" class="bg-blue-900 text-white py-3 rounded-full text-[10px] font-bold btn-press">Taponament</button>
+                <button id="btn-Tòxics" onclick="toggleHT('Tòxics')" class="bg-blue-900 text-white py-3 rounded-full text-[10px] font-bold btn-press">Tòxics</button>
+                <button id="btn-Trombosi" onclick="toggleHT('Trombosi')" class="bg-blue-900 text-white py-3 rounded-full text-[10px] font-bold btn-press leading-tight">Trombosi (IAM/TEP)</button>
+            </div>
+            <button onclick="toggleModal('ht-modal')" class="w-full bg-blue-700 text-white py-4 rounded-full font-bold text-xs uppercase shadow-lg">Acceptar</button>
+        </div>
+    </div>
+
+    <div id="ritme-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-6 z-[115]">
+        <div class="bg-white rounded-3xl w-full max-w-sm p-6 text-center shadow-2xl">
+            <h2 class="text-xs font-bold mb-6 uppercase">Tipus de Ritme</h2>
+            <div class="grid grid-cols-2 gap-2 mb-6">
+                <button onclick="logRitme('AESP')" class="bg-slate-500 text-white py-3 rounded-full text-[11px] font-bold btn-press">AESP</button>
+                <button onclick="logRitme('Asistòlia')" class="bg-slate-500 text-white py-3 rounded-full text-[11px] font-bold btn-press">Asistòlia</button>
+                <button onclick="logRitme('FV')" class="bg-blue-600 text-white py-3 rounded-full text-[11px] font-bold btn-press">FV</button>
+                <button onclick="logRitme('TVsp')" class="bg-blue-600 text-white py-3 rounded-full text-[11px] font-bold btn-press">TVsp</button>
+            </div>
+            <button onclick="logRitme('ROSC')" class="w-full bg-green-600 text-white py-3 rounded-full text-[11px] font-bold mb-4 uppercase shadow-md">ROSC</button>
+            <button onclick="toggleModal('ritme-modal')" class="text-slate-400 font-bold text-xs uppercase">Tancar</button>
+        </div>
+    </div>
+
+    <div id="stop-modal" class="hidden fixed inset-0 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-6 z-[150]">
+        <div class="bg-white rounded-3xl w-full max-w-sm p-6 text-center shadow-2xl">
+            <h2 class="text-lg font-black uppercase mb-4">Aturar RCP?</h2>
+            <button onclick="saveAndReset()" class="w-full bg-red-600 text-white py-4 rounded-2xl font-bold uppercase shadow-lg mb-2">Guardar i Finalitzar</button>
+            <button onclick="resumeCPR()" class="w-full bg-slate-100 py-4 rounded-2xl font-bold uppercase tracking-widest text-slate-600">TORNAR</button>
+        </div>
+    </div>
+
+    <div id="notes-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-6 z-[115]">
+        <div class="bg-white rounded-3xl w-full max-w-sm p-6 shadow-2xl">
+            <h2 class="text-xs font-bold mb-4 uppercase">Nota de Registre</h2>
+            <textarea id="note-input" rows="4" class="w-full border p-3 rounded-xl mb-4 text-sm outline-none focus:border-blue-400" placeholder="Escriu aquí..."></textarea>
+            <div class="flex gap-2">
+                <button onclick="saveNote()" class="flex-1 bg-blue-700 text-white py-3 rounded-full font-bold text-xs uppercase shadow-md">Guardar</button>
+                <button onclick="toggleModal('notes-modal')" class="flex-1 bg-slate-100 py-3 rounded-full font-bold text-xs uppercase text-slate-500">Tancar</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         let totalSecs = 0, cycleSecs = 120, cycles = 1, timer, active = false;
         let counts = { shock:0, adr:0, amio:0 };
         let sessionLog = [];
         let audioCtx = null;
-
         let adrActive = false;
-        let adrLimitSecs = 180; 
-        let adrTimeLeft = 180;
+        let adrLimitSecs = 180, adrTimeLeft = 180;
 
-        // Gestió de Swipe
-        let touchStartX = 0;
-
-        function logAction(action, qty = '-', type = null) {
-            if(!active) startCPR();
-            const id = Date.now();
-            const time = document.getElementById('t-total').innerText;
-            sessionLog.unshift({ id, time, action, qty, type });
-            if(type) updateCount(type, 1);
-            renderLog();
-        }
-
-        function renderLog() {
-            const logDiv = document.getElementById('event-log');
-            if(sessionLog.length > 0 && document.getElementById('placeholder')) document.getElementById('placeholder').remove();
-            
-            logDiv.innerHTML = sessionLog.map(e => `
-                <div class="log-entry" id="entry-${e.id}">
-                    <div class="swipe-container" 
-                         ontouchstart="handleTouchStart(event, ${e.id})" 
-                         ontouchmove="handleTouchMove(event, ${e.id})">
-                        <div class="swipe-content">
-                            <span class="w-20 text-slate-400 font-mono text-[10px]">${e.time}</span>
-                            <span class="flex-1 px-2 uppercase text-center font-bold text-[11px] tracking-tight">${e.action}</span>
-                            <span class="w-16 text-right font-bold text-[11px]">${e.qty}</span>
-                        </div>
-                        <div class="swipe-delete" onclick="deleteLogEntry(${e.id})">Esborrar</div>
-                    </div>
-                </div>
-            `).join('');
-        }
+        // Gestió del Swipe
+        let startX = 0;
+        let currentSwipeId = null;
 
         function handleTouchStart(e, id) {
-            touchStartX = e.touches[0].clientX;
-            // Tanquem altres swipes oberts si n'hi hagués
-            document.querySelectorAll('.swipe-container').forEach(c => c.classList.remove('swiped'));
+            startX = e.touches[0].clientX;
+            currentSwipeId = id;
         }
 
         function handleTouchMove(e, id) {
-            const touchX = e.touches[0].clientX;
-            const diff = touchStartX - touchX;
-            const container = document.querySelector(`#entry-${id} .swipe-container`);
-            if (diff > 50) container.classList.add('swiped');
-            if (diff < -50) container.classList.remove('swiped');
+            let moveX = e.touches[0].clientX;
+            let diff = startX - moveX;
+            let container = document.getElementById('swipe-' + id);
+            if (diff > 30) container.classList.add('swiped');
+            if (diff < -30) container.classList.remove('swiped');
         }
 
-        function deleteLogEntry(id) {
+        function deleteEntry(id) {
             const index = sessionLog.findIndex(e => e.id === id);
             if (index !== -1) {
                 const entry = sessionLog[index];
-                if (entry.type) updateCount(entry.type, -1);
+                if (entry.countType) {
+                    counts[entry.countType]--;
+                    document.getElementById('count-' + entry.countType).innerText = counts[entry.countType];
+                }
                 sessionLog.splice(index, 1);
                 renderLog();
             }
         }
 
+        function logAction(action, qty = '-', countType = null) {
+            if(!active) startCPR();
+            const id = Date.now();
+            const time = document.getElementById('t-total').innerText;
+            sessionLog.push({ id, time, action, qty, countType });
+            renderLog();
+        }
+
         function logAdrenalina() {
             logAction('Adrenalina', '1 mg', 'adr');
+            updateCount('adr');
             if (!adrActive) {
                 adrActive = true;
                 document.getElementById('adr-container').classList.remove('hidden');
@@ -173,18 +232,49 @@
             adrTimeLeft = adrLimitSecs;
         }
 
-        function updateCount(k, val) {
-            counts[k] += val;
-            if (counts[k] < 0) counts[k] = 0;
-            document.getElementById('count-'+k).innerText = counts[k];
+        function renderLog() {
+            const logDiv = document.getElementById('event-log');
+            if(sessionLog.length > 0 && document.getElementById('placeholder')) document.getElementById('placeholder').remove();
+            
+            logDiv.innerHTML = sessionLog.map(e => `
+                <div class="log-entry" ontouchstart="handleTouchStart(event, ${e.id})" ontouchmove="handleTouchMove(event, ${e.id})">
+                    <div class="swipe-container" id="swipe-${e.id}">
+                        <div class="swipe-content">
+                            <span class="w-20 text-slate-400 font-mono text-[10px]">${e.time}</span>
+                            <span class="flex-1 px-2 uppercase text-center tracking-tight font-bold text-[11px]">${e.action}</span>
+                            <span class="w-16 text-right font-bold text-[11px]">${e.qty}</span>
+                        </div>
+                        <div class="delete-btn" onclick="deleteEntry(${e.id})">Esborrar</div>
+                    </div>
+                </div>`).reverse().join('');
         }
+
+        // Resta de funcions originals sense modificacions
+        function toggleAdrLimit() {
+            adrLimitSecs = (adrLimitSecs === 180) ? 120 : 180;
+            document.getElementById('adr-limit-val').innerText = adrLimitSecs / 60;
+            adrTimeLeft = adrLimitSecs;
+            updateUI();
+        }
+
+        const tContainer = document.getElementById('tube-btns');
+        [5.0, 5.5, 6.0, 6.5, 7.0, 7.5, 8.0, 8.5].forEach(m => {
+            const b = document.createElement('button');
+            b.className = "bg-blue-600 text-white py-2 rounded-lg text-[10px] font-bold";
+            b.innerText = m;
+            b.onclick = () => logIntub('Tubo ET', m);
+            tContainer.appendChild(b);
+        });
+
+        function logIntub(device, size) { logAction(device, 'Mida: ' + size); toggleModal('intubacio-modal'); }
 
         function startCPR() {
             if(active) return;
             active = true;
             if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
             timer = setInterval(() => {
-                totalSecs++; cycleSecs--;
+                totalSecs++; 
+                cycleSecs--;
                 if(adrActive) adrTimeLeft--;
 
                 if(cycleSecs <= 0) {
@@ -192,7 +282,7 @@
                     cycleSecs = 120; cycles++;
                     document.getElementById('cycle-count').innerText = cycles;
                     document.getElementById('count-cicles').innerText = cycles;
-                    logAction(`CICLE ${cycles} INICIAT`);
+                    logAction(`CICLE ${cycles} INICIAT`, '-');
                 }
 
                 if(adrActive && adrTimeLeft <= 0) {
@@ -208,44 +298,95 @@
             document.getElementById('t-total').innerText = `${pad(Math.floor(totalSecs/3600))}:${pad(Math.floor((totalSecs%3600)/60))}:${pad(totalSecs%60)}`;
             document.getElementById('t-cycle').innerText = `${pad(Math.floor(cycleSecs/60))}:${pad(cycleSecs%60)}`;
             if(adrActive) document.getElementById('t-adr').innerText = `${pad(Math.floor(adrTimeLeft/60))}:${pad(adrTimeLeft%60)}`;
-            
             const cb = document.getElementById('cycle-box');
             if(cycleSecs < 10) cb.classList.add('alert-flash'); else cb.classList.remove('alert-flash');
+            const ab = document.getElementById('adr-container');
+            if(adrActive && adrTimeLeft < 10) ab.classList.add('adr-flash'); else ab.classList.remove('adr-flash');
         }
 
         function showToast(msg, type) {
             const toast = document.getElementById('toast');
-            document.getElementById('toast-msg').innerText = msg;
+            const toastMsg = toast.querySelector('p:last-child');
+            toastMsg.innerText = msg;
             toast.style.backgroundColor = (type === "red") ? "#ef4444" : "#f97316";
             toast.style.opacity = "1";
             setTimeout(() => toast.style.opacity = "0", 3500);
             if (audioCtx) {
-                const freq = (type === "red") ? 880 : 660;
-                playBeep(freq, 0.2); setTimeout(() => playBeep(freq, 0.4), 300);
+                if(type === "red") { playBeep(880, 0.2); setTimeout(() => playBeep(880, 0.4), 300); }
+                else { playBeep(1100, 0.15); setTimeout(() => playBeep(1100, 0.15), 200); setTimeout(() => playBeep(1100, 0.3), 400); }
             }
         }
 
         function playBeep(freq, duration) {
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
-            osc.connect(gain); gain.connect(audioCtx.destination);
-            osc.frequency.value = freq; osc.type = "square";
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.frequency.value = freq;
+            osc.type = "square";
             gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
             gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
-            osc.start(); osc.stop(audioCtx.currentTime + duration);
+            osc.start();
+            osc.stop(audioCtx.currentTime + duration);
         }
 
-        function toggleAdrLimit() {
-            adrLimitSecs = (adrLimitSecs === 180) ? 120 : 180;
-            document.getElementById('adr-limit-val').innerText = adrLimitSecs / 60;
-            adrTimeLeft = adrLimitSecs;
-            updateUI();
+        function toggleModal(id) { document.getElementById(id).classList.toggle('hidden'); if(id === 'history-modal') loadHistory(); }
+        function logRitme(r) { logAction('Ritme: ' + r); toggleModal('ritme-modal'); }
+        function toggleHT(c) { 
+            const b = document.getElementById('btn-' + c);
+            b.classList.toggle('cause-selected');
+            logAction('Causa: ' + c, b.classList.contains('cause-selected') ? 'SI' : 'NO');
         }
-
-        function toggleModal(id) { document.getElementById(id).classList.toggle('hidden'); }
+        function updateCount(k) { counts[k]++; document.getElementById('count-'+k).innerText = counts[k]; }
         function confirmStop() { if(!active) return; clearInterval(timer); document.getElementById('stop-modal').classList.remove('hidden'); }
         function resumeCPR() { document.getElementById('stop-modal').classList.add('hidden'); active = false; startCPR(); }
-        function saveAndReset() { location.reload(); }
+
+        function saveAndReset() {
+            const session = {
+                id: Date.now(),
+                date: new Date().toLocaleString(),
+                duration: document.getElementById('t-total').innerText,
+                cycles: cycles,
+                log: [...sessionLog],
+                stats: {...counts}
+            };
+            let history = JSON.parse(localStorage.getItem('rcp_history') || '[]');
+            history.push(session);
+            localStorage.setItem('rcp_history', JSON.stringify(history));
+            location.reload(); 
+        }
+
+        function saveNote() {
+            const val = document.getElementById('note-input').value;
+            if(val) { logAction("NOTA: " + val); document.getElementById('note-input').value = ''; toggleModal('notes-modal'); }
+        }
+
+        function loadHistory() {
+            const history = JSON.parse(localStorage.getItem('rcp_history') || '[]');
+            const list = document.getElementById('history-list');
+            list.innerHTML = history.length ? history.map(s => `
+                <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200 text-[10px] shadow-sm mb-3">
+                    <div class="flex justify-between items-start mb-2 uppercase">
+                        <span class="font-black text-blue-700 leading-tight pr-4">${s.date}</span>
+                        <div class="flex gap-3 shrink-0">
+                            <button onclick="editEntry(${s.id})" class="text-[14px] opacity-70">✏️</button>
+                            <button onclick="deleteEntry(${s.id})" class="text-[14px] opacity-70">🗑️</button>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-1 font-bold text-slate-600 mb-2 border-t pt-2 border-slate-200/50">
+                        <span>⏱️ Cicles: ${s.cycles}</span>
+                        <span>Durada: ${s.duration}</span>
+                        <span>⚡ Shock: ${s.stats.shock}</span>
+                        <span>💉 Adren: ${s.stats.adr}</span>
+                    </div>
+                    <details class="mt-2 text-slate-500 bg-white p-2 rounded-lg border">
+                        <summary class="font-bold cursor-pointer uppercase text-[9px] text-blue-600">Detalls</summary>
+                        <div class="mt-2 space-y-1 max-h-40 overflow-y-auto font-mono">
+                            ${s.log.map(l => `<p class="border-b pb-1"><strong>${l.time}</strong> - ${l.action} ${l.qty !== '-' ? '('+l.qty+')' : ''}</p>`).join('')}
+                        </div>
+                    </details>
+                </div>`).reverse().join('') : "<p class='text-center opacity-40 py-8 text-xs font-bold uppercase'>Sense registres.</p>";
+        }
     </script>
 </body>
 </html>
