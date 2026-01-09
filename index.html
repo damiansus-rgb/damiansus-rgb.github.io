@@ -12,14 +12,11 @@
         .btn-press:active { transform: scale(0.95); filter: brightness(0.9); }
         .log-entry { animation: slideIn 0.3s ease-out; border-bottom: 1px solid #f1f5f9; padding: 0.75rem 1rem; background: white; display: flex; justify-content: space-between; align-items: center; }
         @keyframes slideIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
-        
         .alert-flash { animation: flash 1s infinite; }
         @keyframes flash { 0%, 100% { background-color: #fee2e2; } 50% { background-color: #ef4444; color: white; } }
         .adr-flash { animation: flash-orange 1s infinite; }
         @keyframes flash-orange { 0%, 100% { background-color: #ffedd5; } 50% { background-color: #f97316; color: white; } }
-        
         .selected-item { background-color: #64748b !important; color: white !important; border-color: #475569 !important; }
-        
         #toast { transition: opacity 0.5s ease; pointer-events: none; z-index: 200; }
         ::-webkit-scrollbar { display: none; }
     </style>
@@ -93,15 +90,14 @@
     </div>
 
     <div id="sri-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-6 z-[150]">
-        <div class="bg-white rounded-3xl w-full max-w-sm p-6 shadow-2xl overflow-y-auto max-h-[80vh]">
-            <h2 class="text-xs font-bold text-slate-800 mb-6 text-center uppercase tracking-widest">Fàrmacs SRI (Adult)</h2>
+        <div class="bg-white rounded-3xl w-full max-w-sm p-6 shadow-2xl">
+            <h2 class="text-xs font-bold text-slate-800 mb-6 text-center uppercase">Fàrmacs SRI (Adult)</h2>
             <div class="grid grid-cols-1 gap-2 mb-6" id="sri-options">
                 <button onclick="toggleSelect(this, 'Rocuroni', '1.2 mg/kg')" class="bg-slate-50 py-3 rounded-xl text-[11px] font-bold flex justify-between px-4 border border-transparent"><span>Rocuroni</span> <span>1.2 mg/kg</span></button>
                 <button onclick="toggleSelect(this, 'Propofol', '2 mg/kg')" class="bg-slate-50 py-3 rounded-xl text-[11px] font-bold flex justify-between px-4 border border-transparent"><span>Propofol</span> <span>2 mg/kg</span></button>
                 <button onclick="toggleSelect(this, 'Ketamina', '2 mg/kg')" class="bg-slate-50 py-3 rounded-xl text-[11px] font-bold flex justify-between px-4 border border-transparent"><span>Ketamina</span> <span>2 mg/kg</span></button>
                 <button onclick="toggleSelect(this, 'Etomidat', '0.3 mg/kg')" class="bg-slate-50 py-3 rounded-xl text-[11px] font-bold flex justify-between px-4 border border-transparent"><span>Etomidat</span> <span>0.3 mg/kg</span></button>
                 <button onclick="toggleSelect(this, 'Midazolam', '0.3 mg/kg')" class="bg-slate-50 py-3 rounded-xl text-[11px] font-bold flex justify-between px-4 border border-transparent"><span>Midazolam</span> <span>0.3 mg/kg</span></button>
-                <button onclick="toggleSelect(this, 'Succinilcolina', '1.5 mg/kg')" class="bg-slate-50 py-3 rounded-xl text-[11px] font-bold flex justify-between px-4 border border-transparent"><span>Succinilcolina</span> <span>1.5 mg/kg</span></button>
             </div>
             <button onclick="confirmMultiple('sri-modal', 'sri-options')" class="w-full bg-blue-700 text-white py-4 rounded-full font-bold text-xs uppercase shadow-lg mb-2">Acceptar Selecció</button>
             <button onclick="closeAndClear('sri-modal', 'sri-options')" class="w-full bg-slate-100 py-3 rounded-full font-bold text-xs uppercase text-slate-500">Tancar</button>
@@ -146,7 +142,7 @@
 
     <div id="ritme-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-6 z-[150]">
         <div class="bg-white rounded-3xl w-full max-w-sm p-6 text-center shadow-2xl">
-            <h2 class="text-xs font-bold mb-6 uppercase text-slate-400 tracking-widest">Tipus de Ritme</h2>
+            <h2 class="text-xs font-bold mb-6 uppercase">Tipus de Ritme</h2>
             <div class="grid grid-cols-2 gap-2 mb-6">
                 <button onclick="logRitme('AESP')" class="bg-slate-500 text-white py-3 rounded-xl font-bold text-[11px]">AESP</button>
                 <button onclick="logRitme('Asistòlia')" class="bg-slate-500 text-white py-3 rounded-xl font-bold text-[11px]">Asistòlia</button>
@@ -169,11 +165,19 @@
         </div>
     </div>
 
+    <div id="stop-modal" class="hidden fixed inset-0 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-6 z-[200]">
+        <div class="bg-white rounded-3xl w-full max-w-sm p-6 text-center shadow-2xl">
+            <h2 class="text-lg font-black uppercase mb-4 text-red-600">Aturar RCP?</h2>
+            <button onclick="saveAndReset()" class="w-full bg-red-600 text-white py-4 rounded-2xl font-bold uppercase shadow-lg mb-2">Guardar i Finalitzar</button>
+            <button onclick="toggleModal('stop-modal')" class="w-full bg-slate-100 py-4 rounded-2xl font-bold uppercase tracking-widest text-slate-600">TORNAR</button>
+        </div>
+    </div>
+
     <div id="history-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-6 z-[150]">
         <div class="bg-white rounded-3xl w-full max-w-sm p-6 h-[80vh] flex flex-col shadow-2xl text-slate-800">
-            <h2 class="text-xs font-bold mb-4 uppercase text-center tracking-widest text-slate-400">Historial</h2>
+            <h2 class="text-xs font-bold mb-4 uppercase text-center tracking-widest text-slate-400">Historial de Registres</h2>
             <div id="history-list" class="flex-1 overflow-y-auto space-y-3 mb-4"></div>
-            <button onclick="toggleModal('history-modal')" class="w-full bg-blue-700 text-white py-3 rounded-full font-bold text-xs uppercase">Tancar</button>
+            <button onclick="toggleModal('history-modal')" class="w-full bg-blue-700 text-white py-3 rounded-full font-bold text-xs uppercase shadow-md">Tancar</button>
         </div>
     </div>
 
@@ -207,18 +211,6 @@
                 </div>`).reverse().join('');
         }
 
-        function logAdrenalina() {
-            logAction('Adrenalina', '1 mg', 'adr');
-            counts.adr++;
-            document.getElementById('count-adr').innerText = counts.adr;
-            if (!adrActive) {
-                adrActive = true;
-                document.getElementById('adr-container').classList.remove('hidden');
-                document.getElementById('cycle-count-container').classList.add('hidden');
-            }
-            adrSecs = adrLimitSecs;
-        }
-
         function startCPR() {
             if(active) return; active = true;
             if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -238,6 +230,18 @@
             if(adrActive) document.getElementById('t-adr').innerText = `${pad(Math.floor(adrSecs/60))}:${pad(adrSecs%60)}`;
             if(cycleSecs < 10) document.getElementById('cycle-box').classList.add('alert-flash'); else document.getElementById('cycle-box').classList.remove('alert-flash');
             if(adrActive && adrSecs < 10) document.getElementById('adr-container').classList.add('adr-flash'); else document.getElementById('adr-container').classList.remove('adr-flash');
+        }
+
+        function logAdrenalina() {
+            logAction('Adrenalina', '1 mg', 'adr');
+            counts.adr++;
+            document.getElementById('count-adr').innerText = counts.adr;
+            if (!adrActive) {
+                adrActive = true;
+                document.getElementById('adr-container').classList.remove('hidden');
+                document.getElementById('cycle-count-container').classList.add('hidden');
+            }
+            adrSecs = adrLimitSecs;
         }
 
         function toggleSelect(btn, action, qty) {
@@ -278,13 +282,79 @@
             o.start(); o.stop(audioCtx.currentTime + d);
         }
 
-        function toggleModal(id) { document.getElementById(id).classList.toggle('hidden'); }
+        function toggleModal(id) {
+            document.getElementById(id).classList.toggle('hidden');
+            if(id === 'history-modal') loadHistory();
+        }
+
         function toggleAdrLimit() { adrLimitSecs = adrLimitSecs === 180 ? 120 : 180; document.getElementById('adr-limit-val').innerText = adrLimitSecs/60; adrSecs = adrLimitSecs; }
         function logRitme(r) { logAction('Ritme: ' + r); toggleModal('ritme-modal'); }
-        function confirmStop() { if(active) location.reload(); }
-        function saveNote() { const val = document.getElementById('note-input').value; if(val) { logAction("NOTA: " + val); document.getElementById('note-input').value = ''; toggleModal('notes-modal'); } }
+        function confirmStop() { if(active) document.getElementById('stop-modal').classList.remove('hidden'); }
 
-        // Botons Tubs dinàmics
+        // BOTÓ DE FINALITZAR I GUARDAR
+        function saveAndReset() {
+            const session = {
+                id: Date.now(),
+                date: new Date().toLocaleString(),
+                duration: document.getElementById('t-total').innerText,
+                cycles: cycles,
+                log: [...sessionLog],
+                stats: {...counts}
+            };
+            let history = JSON.parse(localStorage.getItem('rcp_history') || '[]');
+            history.push(session);
+            localStorage.setItem('rcp_history', JSON.stringify(history));
+            location.reload(); 
+        }
+
+        function saveNote() { const val = document.getElementById('note-input').value; if(val) { logAction("NOTA", val); document.getElementById('note-input').value = ''; toggleModal('notes-modal'); } }
+
+        // CARREGA HISTORIAL DE LOCALSTORAGE
+        function loadHistory() {
+            const h = JSON.parse(localStorage.getItem('rcp_history') || '[]');
+            const list = document.getElementById('history-list');
+            if (h.length === 0) {
+                list.innerHTML = "<p class='text-center py-10 opacity-30 uppercase text-xs font-bold'>Sense registres guardats</p>";
+                return;
+            }
+            list.innerHTML = h.map(s => `
+                <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200 text-[10px] shadow-sm mb-3">
+                    <div class="flex justify-between items-start mb-2 uppercase">
+                        <span class="font-black text-blue-700 leading-tight pr-4">${s.date}</span>
+                        <div class="flex gap-3 shrink-0">
+                            <button onclick="deleteEntry(${s.id})" class="text-[14px] opacity-70">🗑️</button>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-1 font-bold text-slate-600 mb-2 border-t pt-2 border-slate-200/50">
+                        <span>⏱️ Cicles: ${s.cycles}</span>
+                        <span>Durada: ${s.duration}</span>
+                        <span>⚡ Shock: ${s.stats.shock}</span>
+                        <span>💉 Adren: ${s.stats.adr}</span>
+                        <span>💊 Amio: ${s.stats.amio}</span>
+                    </div>
+                    <details class="mt-2 text-slate-500 bg-white p-2 rounded-lg border">
+                        <summary class="font-bold cursor-pointer uppercase text-[9px] text-blue-600">Veure Detalls</summary>
+                        <div class="mt-2 space-y-1 max-h-40 overflow-y-auto font-mono">
+                            ${s.log.map(l => `<p class="border-b pb-1"><strong>${l.time}</strong> - ${l.action} (${l.qty})</p>`).join('')}
+                        </div>
+                    </details>
+                </div>`).reverse().join('');
+        }
+
+        function deleteEntry(id) {
+            if(confirm("Eliminar registre permanentment?")) {
+                let h = JSON.parse(localStorage.getItem('rcp_history') || '[]');
+                h = h.filter(s => s.id !== id);
+                localStorage.setItem('rcp_history', JSON.stringify(h));
+                loadHistory();
+            }
+        }
+
+        function resumeCPR() {
+            document.getElementById('stop-modal').classList.add('hidden');
+        }
+
+        // Tubs dinàmics
         const tContainer = document.getElementById('tube-btns');
         [5.0, 5.5, 6.0, 6.5, 7.0, 7.5, 8.0, 8.5].forEach(m => {
             const b = document.createElement('button');
@@ -292,12 +362,6 @@
             b.innerText = m; b.onclick = function() { toggleSelect(this, 'Tubo ET', m); };
             tContainer.appendChild(b);
         });
-
-        function loadHistory() {
-            // Lògica bàsica per mostrar la llista de logs guardats (opcional si es vol emmagatzemar permanentment)
-            const list = document.getElementById('history-list');
-            list.innerHTML = "<p class='text-center py-4 text-xs italic opacity-50 uppercase'>Historial de la sessió actual</p>";
-        }
     </script>
 </body>
 </html>
