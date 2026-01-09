@@ -93,16 +93,17 @@
     </div>
 
     <div id="sri-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-6 z-[150]">
-        <div class="bg-white rounded-3xl w-full max-w-sm p-6 shadow-2xl">
-            <h2 class="text-xs font-bold text-slate-800 mb-6 text-center uppercase">Fàrmacs SRI (Adult)</h2>
+        <div class="bg-white rounded-3xl w-full max-w-sm p-6 shadow-2xl overflow-y-auto max-h-[80vh]">
+            <h2 class="text-xs font-bold text-slate-800 mb-6 text-center uppercase tracking-widest">Fàrmacs SRI (Adult)</h2>
             <div class="grid grid-cols-1 gap-2 mb-6" id="sri-options">
                 <button onclick="toggleSelect(this, 'Rocuroni', '1.2 mg/kg')" class="bg-slate-50 py-3 rounded-xl text-[11px] font-bold flex justify-between px-4 border border-transparent"><span>Rocuroni</span> <span>1.2 mg/kg</span></button>
                 <button onclick="toggleSelect(this, 'Propofol', '2 mg/kg')" class="bg-slate-50 py-3 rounded-xl text-[11px] font-bold flex justify-between px-4 border border-transparent"><span>Propofol</span> <span>2 mg/kg</span></button>
                 <button onclick="toggleSelect(this, 'Ketamina', '2 mg/kg')" class="bg-slate-50 py-3 rounded-xl text-[11px] font-bold flex justify-between px-4 border border-transparent"><span>Ketamina</span> <span>2 mg/kg</span></button>
-                <button onclick="toggleSelect(this, 'Midazolam', '0.3 mg/kg')" class="bg-slate-50 py-3 rounded-xl text-[11px] font-bold flex justify-between px-4 border border-transparent"><span>Midazolam</span> <span>0.3 mg/kg</span></button>
                 <button onclick="toggleSelect(this, 'Etomidat', '0.3 mg/kg')" class="bg-slate-50 py-3 rounded-xl text-[11px] font-bold flex justify-between px-4 border border-transparent"><span>Etomidat</span> <span>0.3 mg/kg</span></button>
+                <button onclick="toggleSelect(this, 'Midazolam', '0.3 mg/kg')" class="bg-slate-50 py-3 rounded-xl text-[11px] font-bold flex justify-between px-4 border border-transparent"><span>Midazolam</span> <span>0.3 mg/kg</span></button>
+                <button onclick="toggleSelect(this, 'Succinilcolina', '1.5 mg/kg')" class="bg-slate-50 py-3 rounded-xl text-[11px] font-bold flex justify-between px-4 border border-transparent"><span>Succinilcolina</span> <span>1.5 mg/kg</span></button>
             </div>
-            <button onclick="confirmMultiple('sri-modal', 'sri-options')" class="w-full bg-blue-700 text-white py-4 rounded-full font-bold text-xs uppercase shadow-lg mb-2">Acceptar SRI</button>
+            <button onclick="confirmMultiple('sri-modal', 'sri-options')" class="w-full bg-blue-700 text-white py-4 rounded-full font-bold text-xs uppercase shadow-lg mb-2">Acceptar Selecció</button>
             <button onclick="closeAndClear('sri-modal', 'sri-options')" class="w-full bg-slate-100 py-3 rounded-full font-bold text-xs uppercase text-slate-500">Tancar</button>
         </div>
     </div>
@@ -125,17 +126,54 @@
         </div>
     </div>
 
+    <div id="ht-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-6 z-[150]">
+        <div class="bg-white rounded-3xl w-full max-w-sm p-6 shadow-2xl overflow-y-auto max-h-[80vh]">
+            <h2 class="text-xs font-bold text-slate-800 mb-6 text-center uppercase">Causes Reversibles</h2>
+            <div class="grid grid-cols-2 gap-2 mb-6" id="ht-options">
+                <button onclick="toggleSelect(this, 'Hipovolèmia', 'SI')" class="bg-slate-50 py-3 rounded-full text-[10px] font-bold border border-transparent">Hipovolèmia</button>
+                <button onclick="toggleSelect(this, 'Hipòxia', 'SI')" class="bg-slate-50 py-3 rounded-full text-[10px] font-bold border border-transparent">Hipòxia</button>
+                <button onclick="toggleSelect(this, 'Hipotèrmia', 'SI')" class="bg-slate-50 py-3 rounded-full text-[10px] font-bold border border-transparent">Hipotèrmia</button>
+                <button onclick="toggleSelect(this, 'Hidroelectròl.', 'SI')" class="bg-slate-50 py-3 rounded-full text-[10px] font-bold border border-transparent">Electròlits</button>
+                <button onclick="toggleSelect(this, 'Pneumotòrax', 'SI')" class="bg-slate-50 py-3 rounded-full text-[10px] font-bold border border-transparent">Pneumotòrax</button>
+                <button onclick="toggleSelect(this, 'Taponament', 'SI')" class="bg-slate-50 py-3 rounded-full text-[10px] font-bold border border-transparent">Taponament</button>
+                <button onclick="toggleSelect(this, 'Tòxics', 'SI')" class="bg-slate-50 py-3 rounded-full text-[10px] font-bold border border-transparent">Tòxics</button>
+                <button onclick="toggleSelect(this, 'Trombosi', 'SI')" class="bg-slate-50 py-3 rounded-full text-[10px] font-bold border border-transparent">Trombosi</button>
+            </div>
+            <button onclick="confirmMultiple('ht-modal', 'ht-options')" class="w-full bg-blue-700 text-white py-4 rounded-full font-bold text-xs uppercase shadow-lg mb-2">Acceptar</button>
+            <button onclick="closeAndClear('ht-modal', 'ht-options')" class="w-full bg-slate-100 py-3 rounded-full font-bold text-xs uppercase text-slate-500">Tancar</button>
+        </div>
+    </div>
+
     <div id="ritme-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-6 z-[150]">
         <div class="bg-white rounded-3xl w-full max-w-sm p-6 text-center shadow-2xl">
-            <h2 class="text-xs font-bold mb-6 uppercase">Tipus de Ritme</h2>
+            <h2 class="text-xs font-bold mb-6 uppercase text-slate-400 tracking-widest">Tipus de Ritme</h2>
             <div class="grid grid-cols-2 gap-2 mb-6">
                 <button onclick="logRitme('AESP')" class="bg-slate-500 text-white py-3 rounded-xl font-bold text-[11px]">AESP</button>
                 <button onclick="logRitme('Asistòlia')" class="bg-slate-500 text-white py-3 rounded-xl font-bold text-[11px]">Asistòlia</button>
                 <button onclick="logRitme('FV')" class="bg-blue-600 text-white py-3 rounded-xl font-bold text-[11px]">FV</button>
                 <button onclick="logRitme('TVsp')" class="bg-blue-600 text-white py-3 rounded-xl font-bold text-[11px]">TVsp</button>
             </div>
-            <button onclick="logRitme('ROSC')" class="w-full bg-green-600 text-white py-3 rounded-xl font-bold text-[11px] mb-4 uppercase">ROSC (Recuperació)</button>
+            <button onclick="logRitme('ROSC')" class="w-full bg-green-600 text-white py-3 rounded-xl font-bold text-[11px] mb-4 uppercase">ROSC (Retorn)</button>
             <button onclick="toggleModal('ritme-modal')" class="text-slate-400 font-bold text-xs uppercase">Tancar</button>
+        </div>
+    </div>
+
+    <div id="notes-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-6 z-[150]">
+        <div class="bg-white rounded-3xl w-full max-w-sm p-6 shadow-2xl">
+            <h2 class="text-xs font-bold mb-4 uppercase">Nota de Registre</h2>
+            <textarea id="note-input" rows="4" class="w-full border p-3 rounded-xl mb-4 text-sm outline-none focus:border-blue-400" placeholder="Escriu aquí..."></textarea>
+            <div class="flex gap-2">
+                <button onclick="saveNote()" class="flex-1 bg-blue-700 text-white py-3 rounded-full font-bold text-xs uppercase">Guardar</button>
+                <button onclick="toggleModal('notes-modal')" class="flex-1 bg-slate-100 py-3 rounded-full font-bold text-xs uppercase text-slate-500">Tancar</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="history-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-6 z-[150]">
+        <div class="bg-white rounded-3xl w-full max-w-sm p-6 h-[80vh] flex flex-col shadow-2xl text-slate-800">
+            <h2 class="text-xs font-bold mb-4 uppercase text-center tracking-widest text-slate-400">Historial</h2>
+            <div id="history-list" class="flex-1 overflow-y-auto space-y-3 mb-4"></div>
+            <button onclick="toggleModal('history-modal')" class="w-full bg-blue-700 text-white py-3 rounded-full font-bold text-xs uppercase">Tancar</button>
         </div>
     </div>
 
@@ -244,8 +282,9 @@
         function toggleAdrLimit() { adrLimitSecs = adrLimitSecs === 180 ? 120 : 180; document.getElementById('adr-limit-val').innerText = adrLimitSecs/60; adrSecs = adrLimitSecs; }
         function logRitme(r) { logAction('Ritme: ' + r); toggleModal('ritme-modal'); }
         function confirmStop() { if(active) location.reload(); }
+        function saveNote() { const val = document.getElementById('note-input').value; if(val) { logAction("NOTA: " + val); document.getElementById('note-input').value = ''; toggleModal('notes-modal'); } }
 
-        // Botons Tubs
+        // Botons Tubs dinàmics
         const tContainer = document.getElementById('tube-btns');
         [5.0, 5.5, 6.0, 6.5, 7.0, 7.5, 8.0, 8.5].forEach(m => {
             const b = document.createElement('button');
@@ -253,6 +292,12 @@
             b.innerText = m; b.onclick = function() { toggleSelect(this, 'Tubo ET', m); };
             tContainer.appendChild(b);
         });
+
+        function loadHistory() {
+            // Lògica bàsica per mostrar la llista de logs guardats (opcional si es vol emmagatzemar permanentment)
+            const list = document.getElementById('history-list');
+            list.innerHTML = "<p class='text-center py-4 text-xs italic opacity-50 uppercase'>Historial de la sessió actual</p>";
+        }
     </script>
 </body>
 </html>
