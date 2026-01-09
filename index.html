@@ -14,6 +14,8 @@
         @keyframes slideIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
         .alert-flash { animation: flash 1s infinite; }
         @keyframes flash { 0%, 100% { background-color: #fee2e2; } 50% { background-color: #ef4444; color: white; } }
+        .adr-flash { animation: flash-orange 1s infinite; }
+        @keyframes flash-orange { 0%, 100% { background-color: #ffedd5; } 50% { background-color: #f97316; color: white; } }
         .cause-selected { background-color: #64748b !important; color: white !important; }
         #toast { transition: opacity 0.5s ease; pointer-events: none; }
         ::-webkit-scrollbar { display: none; }
@@ -22,8 +24,8 @@
 <body class="bg-slate-100 h-screen flex flex-col overflow-hidden relative text-slate-800">
 
     <div id="toast" class="opacity-0 fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[100] bg-red-600 text-white px-8 py-4 rounded-3xl shadow-2xl text-center">
-        <p class="text-xs font-bold uppercase mb-1">Atenció</p>
-        <p class="text-2xl font-black uppercase">Revisar Ritme</p>
+        <p id="toast-title" class="text-xs font-bold uppercase mb-1">Atenció</p>
+        <p id="toast-msg" class="text-2xl font-black uppercase">Revisar Ritme</p>
     </div>
 
     <header class="bg-white px-4 pt-12 pb-4 border-b flex justify-between items-center shadow-sm shrink-0">
@@ -88,7 +90,7 @@
     </div>
 
     <div id="history-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-6 z-[120]">
-        <div class="bg-white rounded-3xl w-full max-w-sm p-6 h-[80vh] flex flex-col shadow-2xl text-slate-800">
+        <div class="bg-white rounded-3xl w-full max-w-sm p-6 h-[80vh] flex flex-col shadow-2xl">
             <h2 class="text-xs font-bold mb-4 uppercase text-center tracking-widest text-slate-400">Historial de Registres</h2>
             <div id="history-list" class="flex-1 overflow-y-auto space-y-3 mb-4"></div>
             <button onclick="toggleModal('history-modal')" class="w-full bg-blue-700 text-white py-3 rounded-full font-bold text-xs uppercase shadow-md">Tancar</button>
@@ -147,17 +149,6 @@
         </div>
     </div>
 
-    <div id="notes-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-6 z-[115]">
-        <div class="bg-white rounded-3xl w-full max-w-sm p-6 shadow-2xl">
-            <h2 class="text-xs font-bold mb-4 uppercase">Nota de Registre</h2>
-            <textarea id="note-input" rows="4" class="w-full border p-3 rounded-xl mb-4 text-sm outline-none focus:border-blue-400" placeholder="Escriu aquí..."></textarea>
-            <div class="flex gap-2">
-                <button onclick="saveNote()" class="flex-1 bg-blue-700 text-white py-3 rounded-full font-bold text-xs uppercase shadow-md">Guardar</button>
-                <button onclick="toggleModal('notes-modal')" class="flex-1 bg-slate-100 py-3 rounded-full font-bold text-xs uppercase text-slate-500">Tancar</button>
-            </div>
-        </div>
-    </div>
-
     <div id="stop-modal" class="hidden fixed inset-0 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-6 z-[150]">
         <div class="bg-white rounded-3xl w-full max-w-sm p-6 text-center shadow-2xl">
             <h2 class="text-lg font-black uppercase mb-4">Aturar RCP?</h2>
@@ -174,7 +165,7 @@
 
         // Lógica Adrenalina
         let adrActive = false;
-        let adrLimitSecs = 180; // 3 min por defecto
+        let adrLimitSecs = 180; 
         let adrTimeLeft = 180;
 
         function logAdrenalina() {
@@ -186,19 +177,12 @@
                 document.getElementById('adr-container').classList.remove('hidden');
                 document.getElementById('cycle-count-container').classList.add('hidden');
             }
-            // Resetear el contador cada vez que se pulsa
             adrTimeLeft = adrLimitSecs;
         }
 
         function toggleAdrLimit() {
-            if (adrLimitSecs === 180) {
-                adrLimitSecs = 120;
-                document.getElementById('adr-limit-val').innerText = "2";
-            } else {
-                adrLimitSecs = 180;
-                document.getElementById('adr-limit-val').innerText = "3";
-            }
-            // Opción: Resetear tiempo al cambiar o dejar que siga el descuento
+            adrLimitSecs = (adrLimitSecs === 180) ? 120 : 180;
+            document.getElementById('adr-limit-val').innerText = adrLimitSecs / 60;
             adrTimeLeft = adrLimitSecs;
             updateUI();
         }
@@ -243,15 +227,15 @@
                 if(adrActive) adrTimeLeft--;
 
                 if(cycleSecs <= 0) {
-                    showToast();
+                    showToast("REVISAR RITME", "red");
                     cycleSecs = 120; cycles++;
                     document.getElementById('cycle-count').innerText = cycles;
                     document.getElementById('count-cicles').innerText = cycles;
                     logAction(`CICLE ${cycles} INICIAT`, '-');
                 }
 
-                // Reinicio automático de adrenalina al llegar a 0 (opcional, suele ser aviso)
-                if(adrActive && adrTimeLeft < 0) {
+                if(adrActive && adrTimeLeft <= 0) {
+                    showToast("ADRENALINA", "orange");
                     adrTimeLeft = adrLimitSecs;
                 }
 
@@ -268,18 +252,33 @@
                 const am = Math.floor(adrTimeLeft / 60);
                 const as = adrTimeLeft % 60;
                 document.getElementById('t-adr').innerText = `${pad(am)}:${pad(as)}`;
+                if(adrTimeLeft < 10) document.getElementById('adr-container').classList.add('adr-flash');
+                else document.getElementById('adr-container').classList.remove('adr-flash');
             }
 
             if(cycleSecs < 10) document.getElementById('cycle-box').classList.add('alert-flash');
             else document.getElementById('cycle-box').classList.remove('alert-flash');
         }
 
-        function showToast() {
-            document.getElementById('toast').style.opacity = "1";
-            setTimeout(() => document.getElementById('toast').style.opacity = "0", 3500);
+        function showToast(msg, type) {
+            const toast = document.getElementById('toast');
+            const toastMsg = toast.querySelector('p:last-child');
+            toastMsg.innerText = msg;
+            toast.style.backgroundColor = (type === "red") ? "#ef4444" : "#f97316";
+            toast.style.opacity = "1";
+            setTimeout(() => toast.style.opacity = "0", 3500);
+            
             if (audioCtx) {
-                playBeep(880, 0.2); 
-                setTimeout(() => playBeep(880, 0.4), 300); 
+                if(type === "red") {
+                    // Alarma de ciclo (Ritme)
+                    playBeep(880, 0.2); 
+                    setTimeout(() => playBeep(880, 0.4), 300); 
+                } else {
+                    // Alarma de adrenalina (To més agut i ràpid)
+                    playBeep(1100, 0.15);
+                    setTimeout(() => playBeep(1100, 0.15), 200);
+                    setTimeout(() => playBeep(1100, 0.3), 400);
+                }
             }
         }
 
