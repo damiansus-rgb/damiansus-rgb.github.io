@@ -90,7 +90,7 @@
     </div>
 
     <div id="sri-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-6 z-[150]">
-        <div class="bg-white rounded-3xl w-full max-w-sm p-6 shadow-2xl">
+        <div class="bg-white rounded-3xl w-full max-w-sm p-6 shadow-2xl overflow-y-auto max-h-[80vh]">
             <h2 class="text-xs font-bold text-slate-800 mb-6 text-center uppercase">Fàrmacs SRI (Adult)</h2>
             <div class="grid grid-cols-1 gap-2 mb-6" id="sri-options">
                 <button onclick="toggleSelect(this, 'Rocuroni', '1.2 mg/kg')" class="bg-slate-50 py-3 rounded-xl text-[11px] font-bold flex justify-between px-4 border border-transparent"><span>Rocuroni</span> <span>1.2 mg/kg</span></button>
@@ -124,7 +124,7 @@
 
     <div id="ht-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-6 z-[150]">
         <div class="bg-white rounded-3xl w-full max-w-sm p-6 shadow-2xl overflow-y-auto max-h-[80vh]">
-            <h2 class="text-xs font-bold text-slate-800 mb-6 text-center uppercase">Causes Reversibles</h2>
+            <h2 class="text-xs font-bold text-slate-800 mb-6 text-center uppercase tracking-tight">Causes Reversibles</h2>
             <div class="grid grid-cols-2 gap-2 mb-6" id="ht-options">
                 <button onclick="toggleSelect(this, 'Hipovolèmia', 'SI')" class="bg-slate-50 py-3 rounded-full text-[10px] font-bold border border-transparent">Hipovolèmia</button>
                 <button onclick="toggleSelect(this, 'Hipòxia', 'SI')" class="bg-slate-50 py-3 rounded-full text-[10px] font-bold border border-transparent">Hipòxia</button>
@@ -291,7 +291,8 @@
         function logRitme(r) { logAction('Ritme: ' + r); toggleModal('ritme-modal'); }
         function confirmStop() { if(active) document.getElementById('stop-modal').classList.remove('hidden'); }
 
-        // BOTÓ DE FINALITZAR I GUARDAR
+        // --- FUNCIONS DE GUARDAT I HISTORIAL ---
+
         function saveAndReset() {
             const session = {
                 id: Date.now(),
@@ -307,9 +308,6 @@
             location.reload(); 
         }
 
-        function saveNote() { const val = document.getElementById('note-input').value; if(val) { logAction("NOTA", val); document.getElementById('note-input').value = ''; toggleModal('notes-modal'); } }
-
-        // CARREGA HISTORIAL DE LOCALSTORAGE
         function loadHistory() {
             const h = JSON.parse(localStorage.getItem('rcp_history') || '[]');
             const list = document.getElementById('history-list');
@@ -321,8 +319,9 @@
                 <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200 text-[10px] shadow-sm mb-3">
                     <div class="flex justify-between items-start mb-2 uppercase">
                         <span class="font-black text-blue-700 leading-tight pr-4">${s.date}</span>
-                        <div class="flex gap-3 shrink-0">
-                            <button onclick="deleteEntry(${s.id})" class="text-[14px] opacity-70">🗑️</button>
+                        <div class="flex gap-2 shrink-0">
+                            <button onclick="editHistoryEntry(${s.id})" class="text-[14px] opacity-70">✏️</button>
+                            <button onclick="deleteHistoryEntry(${s.id})" class="text-[14px] opacity-70">🗑️</button>
                         </div>
                     </div>
                     <div class="grid grid-cols-2 gap-1 font-bold text-slate-600 mb-2 border-t pt-2 border-slate-200/50">
@@ -341,7 +340,7 @@
                 </div>`).reverse().join('');
         }
 
-        function deleteEntry(id) {
+        function deleteHistoryEntry(id) {
             if(confirm("Eliminar registre permanentment?")) {
                 let h = JSON.parse(localStorage.getItem('rcp_history') || '[]');
                 h = h.filter(s => s.id !== id);
@@ -350,9 +349,18 @@
             }
         }
 
-        function resumeCPR() {
-            document.getElementById('stop-modal').classList.add('hidden');
+        function editHistoryEntry(id) {
+            let h = JSON.parse(localStorage.getItem('rcp_history') || '[]');
+            const entry = h.find(s => s.id === id);
+            const newName = prompt("Edita el nom/data del registre:", entry.date);
+            if (newName) {
+                entry.date = newName;
+                localStorage.setItem('rcp_history', JSON.stringify(h));
+                loadHistory();
+            }
         }
+
+        function saveNote() { const val = document.getElementById('note-input').value; if(val) { logAction("NOTA", val); document.getElementById('note-input').value = ''; toggleModal('notes-modal'); } }
 
         // Tubs dinàmics
         const tContainer = document.getElementById('tube-btns');
