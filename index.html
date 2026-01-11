@@ -7,7 +7,9 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="PCR SAMU">
+    
     <link rel="apple-touch-icon" href="https://i.ibb.co/LzNfD4f/samu-icon.png">
+    <link rel="icon" type="image/png" href="https://i.ibb.co/LzNfD4f/samu-icon.png">
     
     <title>PCR EXTRAHOSPITALÀRIA</title>
     <script src="https://cdn.tailwindcss.com"></script>
@@ -16,15 +18,12 @@
         .btn-press:active { transform: scale(0.95); filter: brightness(0.9); }
         .log-entry { animation: slideIn 0.3s ease-out; border-bottom: 1px solid #f1f5f9; padding: 0.75rem 1rem; background: white; display: flex; justify-content: space-between; align-items: center; }
         @keyframes slideIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
-        
         .alert-flash { animation: flash 1s infinite; }
         @keyframes flash { 0%, 100% { background-color: #fee2e2; } 50% { background-color: #ef4444; color: white; } }
         .adr-flash { animation: flash-orange 1s infinite; }
         @keyframes flash-orange { 0%, 100% { background-color: #ffedd5; } 50% { background-color: #f97316; color: white; } }
-        
         .selected-item { background-color: #64748b !important; color: white !important; border-color: #475569 !important; }
-        
-        #toast { transition: opacity 0.5s ease; pointer-events: none; z-index: 1000; }
+        #toast { transition: opacity 0.5s ease; pointer-events: none; z-index: 500; }
         ::-webkit-scrollbar { display: none; }
     </style>
 </head>
@@ -145,29 +144,11 @@
         </div>
     </div>
 
-    <div id="ht-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-6 z-[200]">
-        <div class="bg-white rounded-3xl w-full max-w-sm p-6 shadow-2xl overflow-y-auto max-h-[80vh]">
-            <h2 class="text-xs font-bold text-slate-800 mb-6 text-center uppercase tracking-widest">Causes Reversibles</h2>
-            <div class="grid grid-cols-2 gap-2 mb-6" id="ht-options">
-                <button onclick="toggleSelect(this, 'Hipovolèmia', 'SI')" class="bg-slate-50 py-3 rounded-full text-[10px] font-bold border">Hipovolèmia</button>
-                <button onclick="toggleSelect(this, 'Hipòxia', 'SI')" class="bg-slate-50 py-3 rounded-full text-[10px] font-bold border">Hipòxia</button>
-                <button onclick="toggleSelect(this, 'Hipotèrmia', 'SI')" class="bg-slate-50 py-3 rounded-full text-[10px] font-bold border">Hipotèrmia</button>
-                <button onclick="toggleSelect(this, 'Hidroelectròl.', 'SI')" class="bg-slate-50 py-3 rounded-full text-[10px] font-bold border">Electròlits</button>
-                <button onclick="toggleSelect(this, 'Pneumotòrax', 'SI')" class="bg-slate-50 py-3 rounded-full text-[10px] font-bold border">Pneumotòrax</button>
-                <button onclick="toggleSelect(this, 'Taponament', 'SI')" class="bg-slate-50 py-3 rounded-full text-[10px] font-bold border">Taponament</button>
-                <button onclick="toggleSelect(this, 'Tòxics', 'SI')" class="bg-slate-50 py-3 rounded-full text-[10px] font-bold border">Tòxics</button>
-                <button onclick="toggleSelect(this, 'Trombosi', 'SI')" class="bg-slate-50 py-3 rounded-full text-[10px] font-bold border">Trombosi</button>
-            </div>
-            <button onclick="confirmMultiple('ht-modal', 'ht-options')" class="w-full bg-blue-700 text-white py-4 rounded-full font-bold text-xs uppercase mb-2 shadow-lg tracking-wider">Acceptar</button>
-            <button onclick="closeAndClear('ht-modal', 'ht-options')" class="w-full text-slate-400 font-bold text-xs uppercase py-2">Tancar</button>
-        </div>
-    </div>
-
     <div id="history-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-6 z-[300]">
-        <div class="bg-white rounded-3xl w-full max-w-sm p-6 h-[80vh] flex flex-col shadow-2xl">
-            <h2 class="text-xs font-bold mb-4 uppercase text-center tracking-widest text-slate-400">Historial SAMU</h2>
+        <div class="bg-white rounded-3xl w-full max-w-sm p-6 h-[80vh] flex flex-col shadow-2xl text-slate-800">
+            <h2 class="text-xs font-bold mb-4 uppercase text-center tracking-widest text-slate-400">Historial de Registres</h2>
             <div id="history-list" class="flex-1 overflow-y-auto space-y-3 mb-4"></div>
-            <button onclick="toggleModal('history-modal')" class="w-full bg-blue-700 text-white py-3 rounded-full font-bold text-xs uppercase tracking-wider">Tancar</button>
+            <button onclick="toggleModal('history-modal')" class="w-full bg-blue-700 text-white py-3 rounded-full font-bold text-xs uppercase shadow-md">Tancar</button>
         </div>
     </div>
 
@@ -190,6 +171,24 @@
         </div>
     </div>
 
+    <div id="ht-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-6 z-[200]">
+        <div class="bg-white rounded-3xl w-full max-w-sm p-6 shadow-2xl overflow-y-auto max-h-[80vh]">
+            <h2 class="text-xs font-bold text-slate-800 mb-6 text-center uppercase tracking-widest">Causes Reversibles</h2>
+            <div class="grid grid-cols-2 gap-2 mb-6" id="ht-options">
+                <button onclick="toggleSelect(this, 'Hipovolèmia', 'SI')" class="bg-slate-50 py-3 rounded-full text-[10px] font-bold border">Hipovolèmia</button>
+                <button onclick="toggleSelect(this, 'Hipòxia', 'SI')" class="bg-slate-50 py-3 rounded-full text-[10px] font-bold border">Hipòxia</button>
+                <button onclick="toggleSelect(this, 'Hipotèrmia', 'SI')" class="bg-slate-50 py-3 rounded-full text-[10px] font-bold border">Hipotèrmia</button>
+                <button onclick="toggleSelect(this, 'Hidroelectròl.', 'SI')" class="bg-slate-50 py-3 rounded-full text-[10px] font-bold border">Electròlits</button>
+                <button onclick="toggleSelect(this, 'Pneumotòrax', 'SI')" class="bg-slate-50 py-3 rounded-full text-[10px] font-bold border">Pneumotòrax</button>
+                <button onclick="toggleSelect(this, 'Taponament', 'SI')" class="bg-slate-50 py-3 rounded-full text-[10px] font-bold border">Taponament</button>
+                <button onclick="toggleSelect(this, 'Tòxics', 'SI')" class="bg-slate-50 py-3 rounded-full text-[10px] font-bold border">Tòxics</button>
+                <button onclick="toggleSelect(this, 'Trombosi', 'SI')" class="bg-slate-50 py-3 rounded-full text-[10px] font-bold border">Trombosi</button>
+            </div>
+            <button onclick="confirmMultiple('ht-modal', 'ht-options')" class="w-full bg-blue-700 text-white py-4 rounded-full font-bold text-xs uppercase shadow-lg mb-2 tracking-wider">Acceptar</button>
+            <button onclick="closeAndClear('ht-modal', 'ht-options')" class="w-full bg-slate-100 py-3 rounded-full font-bold text-xs uppercase text-slate-500">Tancar</button>
+        </div>
+    </div>
+
     <script>
         let totalSecs = 0, cycleSecs = 120, cycles = 1, timer, active = false;
         let adrSecs = 180, adrLimitSecs = 180, adrActive = false;
@@ -202,12 +201,7 @@
             if(!active) startCPR();
             const time = document.getElementById('t-total').innerText;
             const id = Date.now() + Math.random();
-            
-            if (countType && countType !== 'adr') {
-                counts[countType]++;
-                updateStatsUI();
-            }
-            
+            if (countType && countType !== 'adr') { counts[countType]++; updateStatsUI(); }
             sessionLog.push({ id, time, action, qty, countType });
             renderLog();
         }
@@ -216,10 +210,7 @@
             const index = sessionLog.findIndex(e => e.id === id);
             if (index > -1) {
                 const entry = sessionLog[index];
-                if (entry.countType) {
-                    counts[entry.countType] = Math.max(0, counts[entry.countType] - 1);
-                    updateStatsUI();
-                }
+                if (entry.countType) { counts[entry.countType] = Math.max(0, counts[entry.countType] - 1); updateStatsUI(); }
                 sessionLog.splice(index, 1);
                 renderLog();
             }
@@ -234,7 +225,6 @@
         function renderLog() {
             const logDiv = document.getElementById('event-log');
             if(sessionLog.length > 0 && document.getElementById('placeholder')) document.getElementById('placeholder').remove();
-            
             logDiv.innerHTML = sessionLog.map(e => `
                 <div class="log-entry">
                     <span class="w-16 text-slate-400 font-mono text-[10px] shrink-0">${e.time}</span>
@@ -246,28 +236,16 @@
 
         function saveNote() {
             const val = document.getElementById('note-input').value.trim();
-            if(val) {
-                logAction(val, "-"); 
-                document.getElementById('note-input').value = '';
-                toggleModal('notes-modal');
-            }
+            if(val) { logAction(val, "-"); document.getElementById('note-input').value = ''; toggleModal('notes-modal'); }
         }
 
         function logAdrenalina() {
             logAction('Adrenalina', '1 mg', 'adr');
-            if (!adrActive) {
-                adrActive = true;
-                document.getElementById('adr-container').classList.remove('hidden');
-                document.getElementById('cycle-count-container').classList.add('hidden');
-            }
+            if (!adrActive) { adrActive = true; document.getElementById('adr-container').classList.remove('hidden'); document.getElementById('cycle-count-container').classList.add('hidden'); }
             adrSecs = adrLimitSecs;
         }
 
-        function toggleAdrLimit() {
-            adrLimitSecs = (adrLimitSecs === 180) ? 120 : 180;
-            document.getElementById('adr-limit-val').innerText = adrLimitSecs / 60;
-            adrSecs = adrLimitSecs;
-        }
+        function toggleAdrLimit() { adrLimitSecs = (adrLimitSecs === 180) ? 120 : 180; document.getElementById('adr-limit-val').innerText = adrLimitSecs/60; adrSecs = adrLimitSecs; }
 
         function startCPR() {
             if(active) return; active = true;
@@ -296,10 +274,7 @@
             t.style.backgroundColor = type === "red" ? "#ef4444" : "#f97316";
             t.style.opacity = "1";
             setTimeout(() => t.style.opacity = "0", 3500);
-            if (audioCtx) {
-                const f = type === "red" ? 880 : 1100;
-                [0, 0.2, 0.4].forEach(d => { setTimeout(() => playBeep(f, 0.4), d * 1000); });
-            }
+            if (audioCtx) { const f = type === "red" ? 880 : 1100; [0, 0.2, 0.4].forEach(d => { setTimeout(() => playBeep(f, 0.4), d * 1000); }); }
         }
 
         function playBeep(f, d) {
@@ -311,46 +286,20 @@
             o.start(); o.stop(audioCtx.currentTime + d);
         }
 
-        function toggleSelect(btn, action, qty) {
-            btn.classList.toggle('selected-item');
-            const idx = selectedBuffer.findIndex(i => i.action === action && i.qty === qty);
-            idx > -1 ? selectedBuffer.splice(idx, 1) : selectedBuffer.push({ action, qty });
-        }
-
-        function confirmMultiple(modalId, contId) {
-            selectedBuffer.forEach(i => logAction(i.action, i.qty));
-            closeAndClear(modalId, contId);
-        }
-
-        function closeAndClear(mId, cId) {
-            selectedBuffer = [];
-            document.querySelectorAll(`#${cId} button`).forEach(b => b.classList.remove('selected-item'));
-            toggleModal(mId);
-        }
-
+        function toggleSelect(btn, action, qty) { btn.classList.toggle('selected-item'); const idx = selectedBuffer.findIndex(i => i.action === action && i.qty === qty); idx > -1 ? selectedBuffer.splice(idx, 1) : selectedBuffer.push({ action, qty }); }
+        function confirmMultiple(mId, cId) { selectedBuffer.forEach(i => logAction(i.action, i.qty)); closeAndClear(mId, cId); }
+        function closeAndClear(mId, cId) { selectedBuffer = []; document.querySelectorAll(`#${cId} button`).forEach(b => b.classList.remove('selected-item')); toggleModal(mId); }
         function toggleModal(id) { document.getElementById(id).classList.toggle('hidden'); if(id === 'history-modal') loadHistory(); }
-        
-        function logRitme(r) { 
-            logAction('Ritme: ' + r); 
-            toggleModal('ritme-modal'); 
-        }
-
+        function logRitme(r) { logAction('Ritme: ' + r); toggleModal('ritme-modal'); }
         function confirmStop() { if(active) document.getElementById('stop-modal').classList.remove('hidden'); }
-
-        function saveAndReset() {
-            const session = { id: Date.now(), date: new Date().toLocaleString(), duration: document.getElementById('t-total').innerText, cycles: cycles, log: [...sessionLog], stats: {...counts} };
-            let history = JSON.parse(localStorage.getItem('rcp_history') || '[]');
-            history.push(session);
-            localStorage.setItem('rcp_history', JSON.stringify(history));
-            location.reload(); 
-        }
+        function saveAndReset() { const session = { id: Date.now(), date: new Date().toLocaleString(), duration: document.getElementById('t-total').innerText, cycles: cycles, log: [...sessionLog], stats: {...counts} }; let history = JSON.parse(localStorage.getItem('rcp_history') || '[]'); history.push(session); localStorage.setItem('rcp_history', JSON.stringify(history)); location.reload(); }
 
         function loadHistory() {
             const h = JSON.parse(localStorage.getItem('rcp_history') || '[]');
             const list = document.getElementById('history-list');
             if (h.length === 0) { list.innerHTML = "<p class='text-center py-10 opacity-30 uppercase text-[9px] font-bold'>Sense registres</p>"; return; }
             list.innerHTML = h.map(s => `
-                <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200 text-[10px] shadow-sm mb-3">
+                <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200 text-[10px] shadow-sm mb-3 text-slate-800">
                     <div class="flex justify-between items-start mb-2 uppercase">
                         <span class="font-black text-blue-700 pr-4">${s.date}</span>
                         <div class="flex gap-2 shrink-0">
@@ -369,7 +318,7 @@
                 </div>`).reverse().join('');
         }
 
-        function deleteHistoryEntry(id) { if(confirm("Eliminar permanentment?")) { let h = JSON.parse(localStorage.getItem('rcp_history') || '[]'); h = h.filter(s => s.id !== id); localStorage.setItem('rcp_history', JSON.stringify(h)); loadHistory(); } }
+        function deleteHistoryEntry(id) { if(confirm("Eliminar?")) { let h = JSON.parse(localStorage.getItem('rcp_history') || '[]'); h = h.filter(s => s.id !== id); localStorage.setItem('rcp_history', JSON.stringify(h)); loadHistory(); } }
         function editHistoryEntry(id) { let h = JSON.parse(localStorage.getItem('rcp_history') || '[]'); const entry = h.find(s => s.id === id); const newName = prompt("Nou nom:", entry.date); if (newName) { entry.date = newName; localStorage.setItem('rcp_history', JSON.stringify(h)); loadHistory(); } }
 
         window.onload = function() {
