@@ -112,16 +112,15 @@
 
     <div id="sri-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-6 z-[200]">
         <div class="bg-white rounded-3xl w-full max-w-sm p-6 shadow-2xl overflow-y-auto max-h-[80vh]">
-            <h2 class="text-xs font-bold text-slate-800 mb-6 text-center uppercase">Fàrmacs SRI</h2>
-            <div class="grid grid-cols-1 gap-2 mb-6" id="sri-options">
-                <button onclick="toggleSelect(this, 'Fentanilo', '3 mcg/kg')" class="bg-slate-50 py-3 rounded-xl text-[11px] font-bold flex justify-between px-4 border"><span>Fentanilo</span> <span>3 mcg/kg</span></button>
-                <button onclick="toggleSelect(this, 'Etomidat', '0.3 mg/kg')" class="bg-slate-50 py-3 rounded-xl text-[11px] font-bold flex justify-between px-4 border"><span>Etomidat</span> <span>0.3 mg/kg</span></button>
-                <button onclick="toggleSelect(this, 'Propofol', '2 mg/kg')" class="bg-slate-50 py-3 rounded-xl text-[11px] font-bold flex justify-between px-4 border"><span>Propofol</span> <span>2 mg/kg</span></button>
-                <button onclick="toggleSelect(this, 'Ketamina', '2 mg/kg')" class="bg-slate-50 py-3 rounded-xl text-[11px] font-bold flex justify-between px-4 border"><span>Ketamina</span> <span>2 mg/kg</span></button>
-                <button onclick="toggleSelect(this, 'Midazolam', '0.3 mg/kg')" class="bg-slate-50 py-3 rounded-xl text-[11px] font-bold flex justify-between px-4 border"><span>Midazolam</span> <span>0.3 mg/kg</span></button>
-                <button onclick="toggleSelect(this, 'Rocuroni', '1.2 mg/kg')" class="bg-slate-50 py-3 rounded-xl text-[11px] font-bold flex justify-between px-4 border"><span>Rocuroni</span> <span>1.2 mg/kg</span></button>
-                <button onclick="toggleSelect(this, 'Succinilcolina', '1.5 mg/kg')" class="bg-slate-50 py-3 rounded-xl text-[11px] font-bold flex justify-between px-4 border"><span>Succinilcolina</span> <span>1.5 mg/kg</span></button>
+            <div class="flex justify-between items-center mb-6 gap-2">
+                <h2 class="text-xs font-bold text-slate-800 uppercase">Fàrmacs SRI</h2>
+                <div class="flex items-center gap-2 bg-blue-50 px-3 py-1 rounded-full border border-blue-200">
+                    <span class="text-[9px] font-bold text-blue-600">PES:</span>
+                    <input type="number" id="patient-weight" placeholder="Kg" class="w-12 bg-transparent text-xs font-black text-blue-800 outline-none text-center" oninput="updateSriDoses()">
+                </div>
             </div>
+            <div class="grid grid-cols-1 gap-2 mb-6" id="sri-options">
+                </div>
             <button onclick="confirmMultiple('sri-modal', 'sri-options')" class="w-full bg-blue-700 text-white py-4 rounded-full font-bold text-xs uppercase mb-2 shadow-lg tracking-wider">Acceptar</button>
             <button onclick="closeAndClear('sri-modal', 'sri-options')" class="w-full text-slate-400 font-bold text-xs uppercase py-2">Tancar</button>
         </div>
@@ -198,17 +197,25 @@
         let audioCtx = null;
         let selectedBuffer = [];
 
+        // Definición de fármacos SRI: dosis (mg/kg o mcg/kg) y concentración (mg/ml o mcg/ml)
+        const sriDoseTable = [
+            { name: 'Fentanilo', dose: 3, unit: 'mcg/kg', conc: 50, concUnit: 'mcg/ml' },
+            { name: 'Etomidat', dose: 0.3, unit: 'mg/kg', conc: 2, concUnit: 'mg/ml' },
+            { name: 'Propofol', dose: 2, unit: 'mg/kg', conc: 10, concUnit: 'mg/ml' },
+            { name: 'Ketamina', dose: 2, unit: 'mg/kg', conc: 50, concUnit: 'mg/ml' },
+            { name: 'Midazolam', dose: 0.3, unit: 'mg/kg', conc: 5, concUnit: 'mg/ml' },
+            { name: 'Rocuroni', dose: 1.2, unit: 'mg/kg', conc: 10, concUnit: 'mg/ml' },
+            { name: 'Succinilcolina', dose: 1.5, unit: 'mg/kg', conc: 50, concUnit: 'mg/ml' }
+        ];
+
         function logAction(action, qty = '-', countType = null) {
             if(!active) startCPR();
             const time = document.getElementById('t-total').innerText;
             const id = Date.now() + Math.random();
-            
-            // Actualización de contadores (excepto adrenalina que se gestiona aparte en logAdrenalina)
             if (countType && countType !== 'adr') {
                 counts[countType]++;
                 updateStatsUI();
             }
-            
             sessionLog.push({ id, time, action, qty, countType });
             renderLog();
         }
@@ -235,7 +242,6 @@
         function renderLog() {
             const logDiv = document.getElementById('event-log');
             if(sessionLog.length > 0 && document.getElementById('placeholder')) document.getElementById('placeholder').remove();
-            
             logDiv.innerHTML = sessionLog.map(e => `
                 <div class="log-entry">
                     <span class="w-16 text-slate-400 font-mono text-[10px] shrink-0">${e.time}</span>
@@ -245,27 +251,35 @@
                 </div>`).reverse().join('');
         }
 
-        function saveNote() {
-            const val = document.getElementById('note-input').value.trim();
-            if(val) {
-                logAction(val, "-"); 
-                document.getElementById('note-input').value = '';
-                toggleModal('notes-modal');
-            }
+        function updateSriDoses() {
+            const weight = parseFloat(document.getElementById('patient-weight').value) || 0;
+            const container = document.getElementById('sri-options');
+            container.innerHTML = sriDoseTable.map(f => {
+                const totalDose = (f.dose * weight).toFixed(1);
+                const ml = weight > 0 ? (totalDose / f.conc).toFixed(1) : 0;
+                const displayQty = weight > 0 ? `${totalDose}${f.unit.split('/')[0]} (${ml}ml)` : `${f.dose} ${f.unit}`;
+                
+                return `
+                <button onclick="toggleSelect(this, '${f.name}', '${displayQty}')" class="bg-slate-50 py-3 rounded-xl text-[11px] font-bold flex justify-between px-4 border transition-colors">
+                    <div class="text-left">
+                        <span class="block">${f.name}</span>
+                        <span class="text-[8px] text-slate-400 font-normal">${f.dose}${f.unit} | ${f.conc}${f.concUnit}</span>
+                    </div>
+                    <span class="text-blue-700">${displayQty}</span>
+                </button>`;
+            }).join('');
         }
 
-        // CORRECCIÓN: Sumar adrenalina al contador total e iniciar crono
         function logAdrenalina() {
-            counts.adr++; // Incrementamos el contador manual
-            updateStatsUI(); // Refrescamos la UI de estadísticas
-            
+            counts.adr++;
+            updateStatsUI();
             logAction('Adrenalina', '1 mg', 'adr');
             if (!adrActive) {
                 adrActive = true;
                 document.getElementById('adr-container').classList.remove('hidden');
                 document.getElementById('cycle-count-container').classList.add('hidden');
             }
-            adrSecs = adrLimitSecs; // Reiniciamos crono de adrenalina
+            adrSecs = adrLimitSecs;
         }
 
         function toggleAdrLimit() {
@@ -333,15 +347,14 @@
             toggleModal(mId);
         }
 
-        function toggleModal(id) { document.getElementById(id).classList.toggle('hidden'); if(id === 'history-modal') loadHistory(); }
-        
-        function logRitme(r) { 
-            logAction('Ritme: ' + r); 
-            toggleModal('ritme-modal'); 
+        function toggleModal(id) { 
+            document.getElementById(id).classList.toggle('hidden'); 
+            if(id === 'history-modal') loadHistory();
+            if(id === 'sri-modal') updateSriDoses();
         }
-
+        
+        function logRitme(r) { logAction('Ritme: ' + r); toggleModal('ritme-modal'); }
         function confirmStop() { if(active) document.getElementById('stop-modal').classList.remove('hidden'); }
-
         function saveAndReset() {
             const session = { id: Date.now(), date: new Date().toLocaleString(), duration: document.getElementById('t-total').innerText, cycles: cycles, log: [...sessionLog], stats: {...counts} };
             let history = JSON.parse(localStorage.getItem('rcp_history') || '[]');
@@ -385,6 +398,7 @@
                 b.innerText = m; b.onclick = function() { toggleSelect(this, 'Tubo ET', m); };
                 tContainer.appendChild(b);
             });
+            updateSriDoses();
         };
     </script>
 </body>
