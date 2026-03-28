@@ -119,8 +119,7 @@
                     <input type="number" id="patient-weight" placeholder="Kg" class="w-12 bg-transparent text-xs font-black text-blue-800 outline-none text-center" oninput="updateSriDoses()">
                 </div>
             </div>
-            <div class="grid grid-cols-1 gap-2 mb-6" id="sri-options">
-                </div>
+            <div class="grid grid-cols-1 gap-2 mb-6" id="sri-options"></div>
             <button onclick="confirmMultiple('sri-modal', 'sri-options')" class="w-full bg-blue-700 text-white py-4 rounded-full font-bold text-xs uppercase mb-2 shadow-lg tracking-wider">Acceptar</button>
             <button onclick="closeAndClear('sri-modal', 'sri-options')" class="w-full text-slate-400 font-bold text-xs uppercase py-2">Tancar</button>
         </div>
@@ -197,7 +196,6 @@
         let audioCtx = null;
         let selectedBuffer = [];
 
-        // Definición de fármacos SRI: dosis (mg/kg o mcg/kg) y concentración (mg/ml o mcg/ml)
         const sriDoseTable = [
             { name: 'Fentanilo', dose: 3, unit: 'mcg/kg', conc: 50, concUnit: 'mcg/ml' },
             { name: 'Etomidat', dose: 0.3, unit: 'mg/kg', conc: 2, concUnit: 'mg/ml' },
@@ -258,7 +256,6 @@
                 const totalDose = (f.dose * weight).toFixed(1);
                 const ml = weight > 0 ? (totalDose / f.conc).toFixed(1) : 0;
                 const displayQty = weight > 0 ? `${totalDose}${f.unit.split('/')[0]} (${ml}ml)` : `${f.dose} ${f.unit}`;
-                
                 return `
                 <button onclick="toggleSelect(this, '${f.name}', '${displayQty}')" class="bg-slate-50 py-3 rounded-xl text-[11px] font-bold flex justify-between px-4 border transition-colors">
                     <div class="text-left">
@@ -268,6 +265,15 @@
                     <span class="text-blue-700">${displayQty}</span>
                 </button>`;
             }).join('');
+        }
+
+        function saveNote() {
+            const val = document.getElementById('note-input').value.trim();
+            if(val) {
+                logAction("NOTA: " + val, "-"); 
+                document.getElementById('note-input').value = '';
+                toggleModal('notes-modal');
+            }
         }
 
         function logAdrenalina() {
