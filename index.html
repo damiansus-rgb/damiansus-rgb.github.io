@@ -203,6 +203,7 @@
             const time = document.getElementById('t-total').innerText;
             const id = Date.now() + Math.random();
             
+            // Actualización de contadores (excepto adrenalina que se gestiona aparte en logAdrenalina)
             if (countType && countType !== 'adr') {
                 counts[countType]++;
                 updateStatsUI();
@@ -253,14 +254,18 @@
             }
         }
 
+        // CORRECCIÓN: Sumar adrenalina al contador total e iniciar crono
         function logAdrenalina() {
+            counts.adr++; // Incrementamos el contador manual
+            updateStatsUI(); // Refrescamos la UI de estadísticas
+            
             logAction('Adrenalina', '1 mg', 'adr');
             if (!adrActive) {
                 adrActive = true;
                 document.getElementById('adr-container').classList.remove('hidden');
                 document.getElementById('cycle-count-container').classList.add('hidden');
             }
-            adrSecs = adrLimitSecs;
+            adrSecs = adrLimitSecs; // Reiniciamos crono de adrenalina
         }
 
         function toggleAdrLimit() {
